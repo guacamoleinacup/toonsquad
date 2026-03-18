@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toon Squad 🏀 March Madness 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0f; --bg2: #13131a; --bg3: #1c1c27; --bg4: #252535;
+    --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
+    --text: #f0f0f8; --muted: #9090a8; --accent: #ff6b35; --accent2: #ffad35;
+    --green: #3dd68c; --blue: #4ea8ff; --purple: #b06cff; --red: #ff4d6d; --gold: #ffd700;
+  }
+  body { font-family: 'Syne', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  .header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; position: sticky; top: 0; z-index: 100; }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-ball { width: 36px; height: 36px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; color: white; }
+  .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo-text span { color: var(--accent); }
+  .subtitle { font-size: 12px; color: var(--muted); }
+  .sync-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+  .sync-dot.live { background: var(--green); animation: pulse 2s infinite; }
+  .sync-dot.error { background: var(--red); }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+  .sync-label { font-size: 12px; color: var(--muted); }
+  .nav { display: flex; gap: 4px; flex-wrap: wrap; }
+  .nav-btn { background: none; border: 1px solid var(--border); color: var(--muted); padding: 7px 14px; border-radius: 8px; cursor: pointer; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 500; transition: all .15s; }
+  .nav-btn:hover { border-color: var(--border2); color: var(--text); }
+  .nav-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+  .main { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+  .sync-banner { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; }
+  .sync-banner h3 { font-size: 15px; margin-bottom: 8px; color: var(--blue); }
+  .sync-banner p { font-size: 13px; color: var(--muted); margin-bottom: 10px; line-height: 1.6; }
+  .sync-banner code { background: var(--bg4); padding: 2px 6px; border-radius: 4px; font-size: 11px; color: var(--text); }
+  .input-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .txt-input { background: var(--bg3); border: 1px solid var(--border2); color: var(--text); padding: 8px 12px; border-radius: 8px; font-family: 'Syne', sans-serif; font-size: 13px; flex: 1; min-width: 180px; }
+  .txt-input:focus { outline: 1px solid var(--blue); }
+  .btn { background: var(--blue); border: none; color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; white-space: nowrap; transition: opacity .15s; }
+  .btn:hover { opacity: .85; }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+  .btn-accent { background: var(--accent); }
+  .btn-red { background: var(--red); }
+  .btn-ghost { background: var(--bg4); color: var(--muted); border: 1px solid var(--border); }
+  .btn-green { background: var(--green); color: #000; }
+
+  .ticker { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .ticker-main .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .ticker-main .val { font-size: 26px; font-weight: 800; color: var(--gold); font-family: 'DM Mono', monospace; }
+  .ticker-items { display: flex; gap: 24px; flex-wrap: wrap; }
+  .t-item { text-align: center; }
+  .t-item .label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .t-item .val { font-size: 20px; font-weight: 800; font-family: 'DM Mono', monospace; }
+
+  .section-title { font-size: 17px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .section-title::before { content:''; display:inline-block; width:4px; height:18px; background:var(--accent); border-radius:2px; }
+
+  .lb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; margin-bottom: 32px; }
+  .pc { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; cursor: pointer; transition: all .15s; position: relative; overflow: hidden; }
+  .pc:hover { border-color: var(--border2); transform: translateY(-1px); }
+  .pc.r1 { border-color: rgba(255,215,0,.4); }
+  .pc.r2 { border-color: rgba(192,192,192,.3); }
+  .pc.r3 { border-color: rgba(205,127,50,.3); }
+  .rb { position: absolute; top: 12px; right: 12px; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; font-family: 'DM Mono', monospace; }
+  .r1 .rb { background: rgba(255,215,0,.15); color: var(--gold); }
+  .r2 .rb { background: rgba(192,192,192,.1); color: #c0c0c0; }
+  .r3 .rb { background: rgba(205,127,50,.1); color: #cd7f32; }
+  .pc-name { font-size: 22px; font-weight: 800; letter-spacing: -.5px; margin-bottom: 4px; }
+  .paid-pill { font-size: 11px; padding: 2px 8px; border-radius: 20px; display: inline-block; margin-bottom: 12px; }
+  .paid-y { background: rgba(61,214,140,.15); color: var(--green); }
+  .paid-n { background: rgba(255,77,109,.15); color: var(--red); }
+  .pc-stats { display: flex; gap: 10px; margin-top: 12px; }
+  .pst { flex: 1; }
+  .pst .lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  .pst .v { font-size: 16px; font-weight: 700; font-family: 'DM Mono', monospace; }
+  .prog { height: 3px; background: var(--bg4); border-radius: 2px; margin-top: 12px; }
+  .prog-fill { height: 100%; border-radius: 2px; transition: width .3s; }
+
+  .stand-table { width: 100%; border-collapse: collapse; background: var(--bg2); border-radius: 14px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 32px; }
+  .stand-table th { background: var(--bg3); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); text-align: left; padding: 12px 20px; }
+  .stand-table td { padding: 14px 20px; border-top: 1px solid var(--border); }
+  .stand-table tr:hover td { background: var(--bg3); }
+
+  .pb { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 10px; overflow: hidden; }
+  .pbh { display: flex; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--border); gap: 12px; cursor: pointer; }
+  .pbh:hover { background: var(--bg3); }
+  .pbh .name { font-size: 16px; font-weight: 700; flex: 1; }
+  .pbh .stat { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted); }
+  .pbh .stat span { color: var(--text); font-weight: 500; }
+  .pbh .tog { color: var(--muted); font-size: 18px; transition: transform .2s; }
+  .pbh .tog.open { transform: rotate(180deg); }
+  .tt { width: 100%; border-collapse: collapse; }
+  .tt th { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); text-align: left; padding: 10px 20px; border-bottom: 1px solid var(--border); }
+  .tt td { padding: 10px 20px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  .tt tr:last-child td { border-bottom: none; }
+  .tt tr:hover td { background: var(--bg3); }
+  .sb { display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; padding: 2px 6px; border-radius: 4px; background: var(--bg4); color: var(--muted); }
+
+  .results-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 24px; }
+  .reg-section { margin-bottom: 24px; }
+  .reg-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; padding: 5px 12px; border-radius: 20px; display: inline-block; }
+  .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(285px, 1fr)); gap: 10px; }
+  .gc { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .gm { font-size: 11px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px; }
+  .to { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; margin-bottom: 5px; transition: all .12s; font-size: 13px; font-weight: 600; }
+  .to:hover { border-color: var(--border2); background: var(--bg4); }
+  .to.W { border-color: var(--green); background: rgba(61,214,140,.08); cursor: default; }
+  .to.L { opacity: .3; cursor: default; }
+  .ow { font-size: 10px; color: var(--muted); font-weight: 400; }
+  .bt { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent2); }
+
+  .mc { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .mr { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .mt { display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; border-radius: 6px; font-size: 13px; font-weight: 600; background: var(--bg4); margin-bottom: 3px; }
+  .mt.won { background: rgba(61,214,140,.12); color: var(--green); }
+  .mt.lost { opacity: .35; }
+
+  .log-entry { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .log-entry:last-child { border-bottom: none; }
+
+  .ff-note { background: rgba(78,168,255,.08); border: 1px solid rgba(78,168,255,.2); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--blue); margin-bottom: 16px; line-height: 1.6; }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; padding: 28px; width: 100%; max-width: 460px; max-height: 85vh; overflow-y: auto; position: relative; }
+  .modal-x { position: absolute; top: 18px; right: 18px; background: var(--bg3); border: 1px solid var(--border); color: var(--muted); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; }
+
+  .tabs { display: none; }
+  .tabs.active { display: block; }
+
+  @media(max-width:600px) {
+    .main { padding: 14px; }
+    .lb-grid { grid-template-columns: 1fr 1fr; }
+    .pc-stats { gap: 6px; }
+    .pst .v { font-size: 14px; }
+    .pc-name { font-size: 18px; }
+  }
+  /* AUCTION */
+  .a-budget-card { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center; }
+  .a-budget-card.active-nominator { border-color:var(--accent); box-shadow:0 0 0 2px rgba(255,107,53,.2); }
+  .a-budget-card.passed { opacity:.4; }
+  .a-budget-name { font-size:13px; font-weight:700; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .a-budget-left { font-size:20px; font-weight:800; font-family:'DM Mono',monospace; }
+  .a-budget-spots { font-size:10px; color:var(--muted); margin-top:2px; }
+  .a-budget-maxbid { font-size:10px; color:var(--accent2); margin-top:1px; }
+
+  .team-btn { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:10px 12px; cursor:pointer; text-align:left; transition:all .12s; font-family:'Syne',sans-serif; }
+  .team-btn:hover { border-color:var(--border2); background:var(--bg4); }
+  .team-btn.taken { opacity:.25; cursor:not-allowed; pointer-events:none; }
+  .team-btn .t-seed { font-size:10px; color:var(--muted); font-family:'DM Mono',monospace; }
+  .team-btn .t-name { font-size:13px; font-weight:700; color:var(--text); margin:2px 0; }
+  .team-btn .t-region { font-size:10px; }
+
+  .bid-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .bidder-chip { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:20px; font-size:12px; font-weight:600; border:1px solid var(--border); cursor:pointer; transition:all .12s; background:var(--bg3); white-space:nowrap; }
+  .bidder-chip:hover { border-color:var(--border2); }
+  .bidder-chip.winning { background:rgba(61,214,140,.1); border-color:var(--green); color:var(--green); }
+  .bidder-chip.passed-chip { opacity:.3; pointer-events:none; }
+  .bid-input { background:var(--bg3); border:1px solid var(--border2); color:var(--text); padding:8px 12px; border-radius:8px; font-family:'DM Mono',monospace; font-size:16px; font-weight:700; width:100px; text-align:center; }
+  .bid-input:focus { outline:1px solid var(--accent2); }
+
+  .log-pick { padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; display:flex; align-items:center; justify-content:space-between; }
+  .log-pick:last-child { border-bottom:none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-ball">T</div>
+    <div>
+      <div class="logo-text">Toon <span>Squad</span></div>
+      <div class="subtitle">March Madness Auction 2026 · Live</div>
+    </div>
+  </div>
+  <div class="sync-row">
+    <div class="sync-dot" id="sync-dot"></div>
+    <span class="sync-label" id="sync-label">Local only</span>
+    <button id="admin-btn" class="btn btn-sm btn-ghost" onclick="adminUnlocked?lockAdmin():requireAdmin(()=>{})" style="color:var(--muted)">🔒 Admin</button>
+    <button class="btn btn-sm btn-ghost" onclick="toggleSyncBanner()">⚙ Sync</button>
+  </div>
+  <div class="nav">
+    <button class="nav-btn active" onclick="showTab('standings',this)">Standings</button>
+    <button class="nav-btn" onclick="showTab('teams',this)">Teams</button>
+    <button class="nav-btn" onclick="showTab('bracket',this)">Bracket & Results</button>
+    <button class="nav-btn" onclick="showTab('rules',this)">Rules</button>
+    <button class="nav-btn" onclick="showTab('history',this)">History</button>
+    <button class="nav-btn" onclick="showTab('auction',this)" style="border-color:var(--gold);color:var(--gold)">🔨 Auction</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <div id="sync-banner" class="sync-banner" style="display:none">
+    <h3>⚡ Real-Time Sync Setup (Free, 2 minutes)</h3>
+    <p>Everyone sees the same results live when you connect to a shared cloud bin.</p>
+    <p><strong style="color:var(--text)">Steps:</strong> Go to <a href="https://jsonbin.io" target="_blank" style="color:var(--blue)">jsonbin.io</a> → Create free account → Click "Create Bin" → paste <code>{}</code> as content → Save → Copy the <strong style="color:var(--text)">Bin ID</strong> from the URL and your <strong style="color:var(--text)">Master Key</strong> from API Keys. Paste both below, then share this HTML file with everyone — they enter the same Bin ID &amp; Key and all stay in sync.</p>
+    <div class="input-row">
+      <input id="bin-id" class="txt-input" placeholder="Bin ID  (e.g. 67abc123def456...)">
+      <input id="api-key" class="txt-input" placeholder="Master Key  ($2b$10$...)">
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-green" onclick="saveSyncConfig()">Save &amp; Connect</button>
+      <button class="btn btn-ghost btn-sm" onclick="clearSyncConfig()" id="disconnect-btn" style="display:none">Disconnect</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('sync-banner').style.display='none'">Close</button>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:10px">No account? Use <strong style="color:var(--text)">Export / Import</strong> in the Results tab to manually copy-paste state between devices.</p>
+  </div>
+
+  <div class="ticker">
+    <div class="ticker-main">
+      <div class="label">Auction Budget</div>
+      <div class="val">$60</div>
+      <div style="font-size:11px;color:var(--muted)">per player · $64 entry fee</div>
+    </div>
+    <div class="ticker-items">
+      <div class="t-item"><div class="label">Banked</div><div class="val" id="t-banked" style="color:var(--green)">$0.00</div></div>
+      <div class="t-item"><div class="label">In Play</div><div class="val" id="t-inplay" style="color:var(--accent)">$480.00</div></div>
+      <div class="t-item"><div class="label">Champ Bonus</div><div class="val" style="color:var(--purple)">$32</div></div>
+      <div class="t-item"><div class="label">Teams Alive</div><div class="val" id="t-alive" style="color:var(--blue)">64</div></div>
+    </div>
+  </div>
+
+  <!-- STANDINGS -->
+  <div id="tab-standings" class="tabs active">
+    <div class="section-title">Leaderboard</div>
+    <div class="lb-grid" id="leaderboard"></div>
+    <div class="section-title">Full Standings</div>
+    <table class="stand-table">
+      <thead><tr>
+        <th style="width:50px">#</th><th>Player</th><th>Teams Left</th>
+        <th>Banked</th><th>Remaining Potential</th><th>Status</th>
+      </tr></thead>
+      <tbody id="stand-body"></tbody>
+    </table>
+  </div>
+
+  <!-- TEAMS -->
+  <div id="tab-teams" class="tabs">
+    <div class="section-title">All Teams by Player</div>
+    <div id="teams-list"></div>
+  </div>
+
+  <!-- BRACKET & RESULTS -->
+  <div id="tab-bracket" class="tabs">
+
+    <!-- ESPN sync bar + admin tools -->
+    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 16px;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div id="espn-dot" style="width:8px;height:8px;border-radius:50%;background:var(--accent2);flex-shrink:0"></div>
+        <span id="espn-status" style="font-size:12px;color:var(--muted)">Connecting to ESPN...</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button id="espn-toggle-btn" class="btn btn-sm" style="background:var(--green);color:#000;font-weight:700" onclick="toggleESPNPoll()">⏸ Pause Auto-Sync</button>
+        <button class="btn btn-sm btn-ghost" onclick="pollESPN(false)">↻ Check Now</button>
+        <button class="btn btn-sm btn-ghost" onclick="doExport()">⬆ Export</button>
+        <button class="btn btn-sm btn-ghost" onclick="toggleImport()">⬇ Import</button>
+        <button class="btn btn-sm btn-red" onclick="doReset()">↺ Reset</button>
+      </div>
+    </div>
+
+    <div id="import-wrap" style="display:none;margin-bottom:14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px">
+      <textarea id="import-txt" style="width:100%;height:70px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:8px;font-family:'DM Mono',monospace;font-size:11px;resize:vertical" placeholder="Paste exported JSON here..."></textarea>
+      <button class="btn btn-sm btn-green" style="margin-top:6px" onclick="doImport()">Import</button>
+    </div>
+
+    <!-- First four note -->
+    <div class="ff-note" style="margin-bottom:20px">
+      <strong>First Four results (March 17–18):</strong><br>
+      ✓ Howard beat UMBC 86–83 → Michigan vs <strong>Howard</strong><br>
+      ✓ Texas beat NC State 68–66 → BYU vs <strong>Texas</strong> (RICK's slot)<br>
+      ✓ SMU beat Miami (OH) → Tennessee vs <strong>SMU/MIAMI OH</strong> (JMACK's slot)<br>
+      ✓ Lehigh beat Prairie View A&M → Florida vs <strong>Lehigh/PV</strong> (CUP's slot)
+    </div>
+
+    <!-- Bracket (click to enter results if admin) -->
+    <div id="bracket-wrap"></div>
+
+    <!-- Payout log -->
+    <div style="margin-top:32px">
+      <div class="section-title">Payout Log</div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px">
+        <p id="no-log" style="color:var(--muted);font-size:13px">No results yet.</p>
+        <div id="log-entries"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RULES -->
+  <div id="tab-rules" class="tabs">
+    <div class="section-title">How It Works</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-bottom:32px">
+
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:22px">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:8px;font-weight:700">💰 Entry &amp; Budget</div>
+        <div style="font-size:22px;font-weight:800;margin-bottom:6px">$64 Entry Fee</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7">
+          Each player pays <strong style="color:var(--text)">$64</strong> to enter.<br>
+          <strong style="color:var(--text)">$60</strong> is your auction bidding budget — all $60 <em>must</em> be spent.<br>
+          The remaining <strong style="color:var(--purple)">$32</strong> (extra $4 × 8 players) goes as a bonus to whoever drafts the tournament champion.
+        </div>
+      </div>
+
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:22px">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:8px;font-weight:700">🏀 Draft Rules</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7">
+          • Everyone must own exactly <strong style="color:var(--text)">8 teams</strong> at the end of the auction.<br>
+          • <strong style="color:var(--text)">#15 &amp; #16 seeds</strong> are drafted randomly for <strong style="color:var(--text)">$0.50 each</strong> before bidding begins.<br>
+          • Minimum bid is <strong style="color:var(--text)">$0.50</strong>.<br>
+          • Players take turns nominating a team and must bid at least $0.50 on their own nomination.<br>
+          • Once you <strong style="color:var(--text)">Pass</strong> or declare done bidding on a team, you cannot jump back in.
+        </div>
+      </div>
+
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:22px">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:8px;font-weight:700">📊 Budget Constraint</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7">
+          You must always keep enough money to fill your remaining roster spots at the $0.50 minimum.<br><br>
+          <strong style="color:var(--text)">Max bid formula:</strong><br>
+          <span style="font-family:'DM Mono',monospace;font-size:13px;background:var(--bg4);padding:6px 10px;border-radius:6px;display:inline-block;margin-top:4px;color:var(--accent2)">$ Left − ($0.50 × empty spots remaining)</span><br><br>
+          Example: $60 budget, 0 teams → max first bid = <strong style="color:var(--text)">$56.50</strong>
+        </div>
+      </div>
+
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:22px">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:8px;font-weight:700">🏆 Winning Money</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7">
+          When your team <strong style="color:var(--text)">wins a game</strong>, you earn the <strong style="color:var(--text)">losing team's bid amount</strong>.<br><br>
+          <strong style="color:var(--text)">Example:</strong> Michigan State ($30) vs Wisconsin ($20). Wisconsin wins →<br>
+          <span style="color:var(--green);font-family:'DM Mono',monospace">Wisconsin owner banks +$30</span><br>
+          Wisconsin's $20 bid stays at risk — that's what the next opponent would earn if they beat Wisconsin.
+        </div>
+      </div>
+
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:22px">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--purple);margin-bottom:8px;font-weight:700">🎯 Championship Bonus</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7">
+          Whoever owns the <strong style="color:var(--text)">tournament champion</strong> wins an additional <strong style="color:var(--purple)">$32 bonus</strong> on top of all their regular game winnings.<br><br>
+          This bonus comes from the $4 extra per player in the entry fee (8 × $4 = $32).
+        </div>
+      </div>
+
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:22px">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--red);margin-bottom:8px;font-weight:700">📝 Quick Example</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7">
+          SKRAEMS owns <strong style="color:var(--text)">Florida ($31)</strong>. BEAN owns <strong style="color:var(--text)">Clemson ($2.50)</strong>.<br><br>
+          If Clemson upsets Florida:<br>
+          <span style="color:var(--green);font-family:'DM Mono',monospace">BEAN banks +$31 🤑</span><br><br>
+          If Florida beats Clemson:<br>
+          <span style="color:var(--green);font-family:'DM Mono',monospace">SKRAEMS banks +$2.50</span><br>
+          Florida ($31) remains at risk for their next game.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div id="tab-history" class="tabs">
+    <div class="section-title">All-Time Standings</div>
+
+    <!-- All-time summary table -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:24px">
+    <div id="history-alltime-body" style="display:grid;gap:10px;margin-bottom:24px"></div>
+
+    <!-- Year-by-year breakdown -->
+    <div class="section-title">Year by Year</div>
+    <div style="display:grid;gap:16px" id="history-years"></div>
+  </div>
+
+  <!-- AUCTION -->
+  <div id="tab-auction" class="tabs">
+
+    <!-- SETUP -->
+    <div id="auction-setup">
+      <div class="section-title">🔨 Auction Draft</div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px">
+        <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px">
+          Add players, set budgets and team counts, then start. #15 &amp; #16 seeds go clockwise at $0.50 each first, then open bidding begins.
+        </div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px">Players</div>
+        <div id="auction-player-setup" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;margin-bottom:16px"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;align-items:flex-end">
+          <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Name</div><input id="new-player-name" class="txt-input" placeholder="Player name" style="width:170px" onkeydown="if(event.key==='Enter')addAuctionPlayer()"></div>
+          <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Budget</div><input id="new-player-budget" class="txt-input" type="number" value="60" style="width:80px"></div>
+          <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Teams</div><input id="new-player-spots" class="txt-input" type="number" value="8" style="width:70px"></div>
+          <button class="btn btn-sm" onclick="addAuctionPlayer()">+ Add</button>
+        </div>
+        <button class="btn btn-accent" style="font-size:15px;padding:12px 28px" onclick="startAuction()">🔨 Start Auction</button>
+      </div>
+    </div>
+
+    <!-- LIVE -->
+    <div id="auction-live" style="display:none">
+
+      <!-- Player budget bar -->
+      <div id="auction-budgets" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:16px"></div>
+
+      <!-- Current item being bid on -->
+      <div id="auction-item-card" style="background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:24px;margin-bottom:14px"></div>
+
+      <!-- Bidding controls -->
+      <div id="auction-bid-controls" style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px;display:none"></div>
+
+      <!-- Pre-pick panel (15/16 seeds) -->
+      <div id="auction-prepick-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px;display:none">
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px">Phase 1 — #15 &amp; #16 Seed Selection <span style="color:var(--muted);font-weight:400;font-size:12px">(clockwise, $0.50 each)</span></div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:14px"><span id="prepick-whose-turn" style="color:var(--accent);font-weight:700"></span> — pick a seed</div>
+        <div id="prepick-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:6px"></div>
+      </div>
+
+      <!-- Nominate panel -->
+      <div id="auction-nominate-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px;display:none">
+        <div style="font-size:13px;font-weight:700;margin-bottom:14px">
+          <span id="nominator-name" style="color:var(--accent)"></span> — nominate a team
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <input id="team-search" class="txt-input" placeholder="Search team..." oninput="aFilterTeams()" style="max-width:220px">
+          <select id="team-region-filter" class="txt-input" onchange="aFilterTeams()" style="max-width:150px">
+            <option value="">All regions</option>
+            <option>East</option><option>West</option><option>Midwest</option><option>South</option>
+          </select>
+        </div>
+        <div id="auction-team-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:6px;max-height:300px;overflow-y:auto;padding-right:4px"></div>
+      </div>
+
+      <!-- Draft log -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+          <div class="section-title" style="font-size:14px;margin-bottom:0">Draft Log</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm" id="undo-pick-btn" onclick="aUndoLast()" style="display:none">↩ Undo Last</button>
+            <button class="btn btn-ghost btn-sm" onclick="resetAuction()">↺ Reset</button>
+          </div>
+        </div>
+        <div id="auction-log"><div style="color:var(--muted);font-size:13px">No picks yet.</div></div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <button class="modal-x" onclick="document.getElementById('modal').classList.remove('open')">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const PLAYERS = [
+  {id:'DEEDS',paid:false},{id:'BEAN',paid:true},{id:'GUAC',paid:false},{id:'SKRAEMS',paid:false},
+  {id:'RICK',paid:false},{id:'JMACK',paid:true},{id:'DEW',paid:true},{id:'CUP',paid:true},
+];
+const COLORS = {DEEDS:'#ff6b35',BEAN:'#4ea8ff',GUAC:'#3dd68c',SKRAEMS:'#b06cff',RICK:'#ffad35',JMACK:'#ff4d6d',DEW:'#00d4ff',CUP:'#ffd700'};
+const RC = {East:'#b06cff',West:'#3dd68c',Midwest:'#4ea8ff',South:'#ff6b35'};
+
+const TEAMS = [
+  {o:'DEEDS',n:'ALABAMA',s:4,b:8},{o:'DEEDS',n:'UCONN',s:2,b:24.5},{o:'DEEDS',n:'KANSAS',s:4,b:7},
+  {o:'DEEDS',n:'GEORGIA',s:8,b:4},{o:'DEEDS',n:'SOUTH FLORIDA',s:11,b:5},{o:'DEEDS',n:'ST LOUIS',s:9,b:5.5},
+  {o:'DEEDS',n:'TEXAS A&M',s:10,b:5.5},{o:'DEEDS',n:'IDAHO',s:15,b:0.5},
+  {o:'BEAN',n:'CLEMSON',s:8,b:2.5},{o:'BEAN',n:'PURDUE',s:2,b:26},{o:'BEAN',n:'GONZAGA',s:3,b:19},
+  {o:'BEAN',n:'ST MARYS',s:7,b:10.5},{o:'BEAN',n:'MCNEESE',s:12,b:0.5},{o:'BEAN',n:'CA BAPTIST',s:13,b:0.5},
+  {o:'BEAN',n:'KENNESAW ST',s:14,b:0.5},{o:'BEAN',n:'TENNESSE ST',s:15,b:0.5},
+  {o:'GUAC',n:'WISCONSIN',s:5,b:10},{o:'GUAC',n:'MICH ST',s:3,b:13},{o:'GUAC',n:'HOUSTON',s:2,b:21},
+  {o:'GUAC',n:'NEBRASKA',s:4,b:14},{o:'GUAC',n:'N DAKOTA ST',s:14,b:0.5},{o:'GUAC',n:"HAWAI'I",s:13,b:0.5},
+  {o:'GUAC',n:'WRIGHT ST',s:14,b:0.5},{o:'GUAC',n:'QUEENS',s:15,b:0.5},
+  {o:'SKRAEMS',n:'ARKANSAS',s:4,b:15.5},{o:'SKRAEMS',n:'FLORIDA',s:1,b:31},{o:'SKRAEMS',n:'SANTA CLARA',s:10,b:1.5},
+  {o:'SKRAEMS',n:'BYU',s:6,b:6},{o:'SKRAEMS',n:'HIGH POINT',s:12,b:1},{o:'SKRAEMS',n:'VILLANOVA',s:8,b:4},
+  {o:'SKRAEMS',n:'PENN',s:14,b:0.5},{o:'SKRAEMS',n:'SIENA',s:16,b:0.5},
+  {o:'RICK',n:'ILLINOIS',s:3,b:13.5},{o:'RICK',n:'MICHIGAN',s:1,b:32},{o:'RICK',n:'UCLA',s:7,b:7.5},
+  {o:'RICK',n:'TEXAS',s:11,b:1},{o:'RICK',n:'NORTHERN IOWA',s:12,b:1},{o:'RICK',n:'AKRON',s:12,b:1},
+  {o:'RICK',n:'TROY',s:13,b:3.5},{o:'RICK',n:'FURMAN',s:15,b:0.5},
+  {o:'JMACK',n:'ARIZONA',s:1,b:34.5},{o:'JMACK',n:'VANDERBILT',s:5,b:9.5},{o:'JMACK',n:'KENTUCKY',s:7,b:3},
+  {o:'JMACK',n:'TCU',s:9,b:5},{o:'JMACK',n:'SMU/MIAMI OH',s:11,b:1.5},{o:'JMACK',n:'MISSOURI',s:10,b:1},
+  {o:'JMACK',n:'UCF',s:10,b:5},{o:'JMACK',n:'HOWARD',s:16,b:0.5},
+  {o:'DEW',n:'IOWA ST',s:2,b:19},{o:'DEW',n:'VCU',s:11,b:4},{o:'DEW',n:'VIRGINIA',s:3,b:14},
+  {o:'DEW',n:'UTAH ST',s:9,b:2.5},{o:'DEW',n:'TEXAS TECH',s:5,b:6.5},{o:'DEW',n:'MIAMI',s:7,b:6},
+  {o:'DEW',n:'ST. JOHNS',s:5,b:7.5},{o:'DEW',n:'LONG ISLAND',s:16,b:0.5},
+  {o:'CUP',n:'DUKE',s:1,b:35.5},{o:'CUP',n:'TENNESSEE',s:6,b:3.5},{o:'CUP',n:'OHIO ST',s:8,b:1},
+  {o:'CUP',n:'LOUISVILLE',s:6,b:6},{o:'CUP',n:'IOWA',s:9,b:1.5},{o:'CUP',n:'NORTH CAROLINA',s:6,b:11.5},
+  {o:'CUP',n:'HOFSTRA',s:13,b:0.5},{o:'CUP',n:'LEHIGH/PV',s:16,b:0.5},
+];
+
+// Official 2026 R64 bracket
+// First Four results applied:
+//   Howard beat UMBC  → Michigan (R1) vs Howard
+//   Texas beat NC State → BYU (R1) vs Texas (RICK owns TEXAS slot)
+//   SMU vs Miami(OH) tonight → Tennessee (R1) vs SMU/MIAMI OH (JMACK owns this)
+//   Lehigh vs PV tonight   → Florida (R1) vs LEHIGH/PV (CUP owns this)
+const MS = [
+  // EAST
+  {r:'East',sA:1,tA:'DUKE',       sB:16,tB:'SIENA'},
+  {r:'East',sA:8,tA:'OHIO ST',    sB:9, tB:'TCU'},
+  {r:'East',sA:5,tA:'ST. JOHNS',  sB:12,tB:'NORTHERN IOWA'},
+  {r:'East',sA:4,tA:'KANSAS',     sB:13,tB:'CA BAPTIST'},
+  {r:'East',sA:6,tA:'LOUISVILLE', sB:11,tB:'SOUTH FLORIDA'},
+  {r:'East',sA:3,tA:'MICH ST',    sB:14,tB:'N DAKOTA ST'},
+  {r:'East',sA:7,tA:'UCLA',       sB:10,tB:'UCF'},
+  {r:'East',sA:2,tA:'UCONN',      sB:15,tB:'FURMAN'},
+  // WEST
+  {r:'West',sA:1,tA:'ARIZONA',    sB:16,tB:'LONG ISLAND'},
+  {r:'West',sA:8,tA:'VILLANOVA',  sB:9, tB:'UTAH ST'},
+  {r:'West',sA:5,tA:'WISCONSIN',  sB:12,tB:'HIGH POINT'},
+  {r:'West',sA:4,tA:'ARKANSAS',   sB:13,tB:"HAWAI'I"},
+  {r:'West',sA:6,tA:'BYU',        sB:11,tB:'TEXAS'},   // Texas won First Four; RICK owns TEXAS
+  {r:'West',sA:3,tA:'GONZAGA',    sB:14,tB:'KENNESAW ST'},
+  {r:'West',sA:7,tA:'MIAMI',      sB:10,tB:'MISSOURI'},
+  {r:'West',sA:2,tA:'PURDUE',     sB:15,tB:'QUEENS'},
+  // MIDWEST
+  {r:'Midwest',sA:1,tA:'MICHIGAN',   sB:16,tB:'HOWARD'},       // Howard beat UMBC (First Four)
+  {r:'Midwest',sA:8,tA:'GEORGIA',    sB:9, tB:'ST LOUIS'},
+  {r:'Midwest',sA:5,tA:'TEXAS TECH', sB:12,tB:'AKRON'},
+  {r:'Midwest',sA:4,tA:'ALABAMA',    sB:13,tB:'HOFSTRA'},
+  {r:'Midwest',sA:6,tA:'TENNESSEE',  sB:11,tB:'SMU/MIAMI OH'}, // First Four tonight — JMACK owns
+  {r:'Midwest',sA:3,tA:'VIRGINIA',   sB:14,tB:'WRIGHT ST'},
+  {r:'Midwest',sA:7,tA:'KENTUCKY',   sB:10,tB:'SANTA CLARA'},
+  {r:'Midwest',sA:2,tA:'IOWA ST',    sB:15,tB:'TENNESSE ST'},
+  // SOUTH
+  {r:'South',sA:1,tA:'FLORIDA',        sB:16,tB:'LEHIGH/PV'},    // First Four tonight — CUP owns
+  {r:'South',sA:8,tA:'CLEMSON',        sB:9, tB:'IOWA'},
+  {r:'South',sA:5,tA:'VANDERBILT',     sB:12,tB:'MCNEESE'},
+  {r:'South',sA:4,tA:'NEBRASKA',       sB:13,tB:'TROY'},
+  {r:'South',sA:6,tA:'NORTH CAROLINA', sB:11,tB:'VCU'},
+  {r:'South',sA:3,tA:'ILLINOIS',       sB:14,tB:'PENN'},
+  {r:'South',sA:7,tA:'ST MARYS',       sB:10,tB:'TEXAS A&M'},
+  {r:'South',sA:2,tA:'HOUSTON',        sB:15,tB:'IDAHO'},
+];
+
+function tInfo(n) { return TEAMS.find(t=>t.n===n)||{o:'?',s:'?',b:0}; }
+function owner(n) { return tInfo(n).o; }
+function bid(n)   { return tInfo(n).b; }
+
+// ===== STATE =====
+let R = {}, P = {}, PAID = {}; // R = results {idx:{winner,loser}}, P = payouts {player:$}, PAID = overrides
+let syncCfg = JSON.parse(localStorage.getItem('ts26sync')||'null') || {id:'69bb1c39c3097a1dd539a41a',key:'$2a$10$bi8u/5Db8qyxEsv/QYyvuu03trS2sjASrsf0TXa.m3CIfARihdZdS'};
+let syncIv = null, lastHash = '';
+
+// ===== ADMIN AUTH =====
+const ADMIN_PASS = 'thisismarchbaby123!';
+let adminUnlocked = false;
+
+function isAdmin() { return adminUnlocked; }
+function requireAdmin(fn) {
+  if (adminUnlocked) { fn(); return; }
+  const pass = prompt('Enter admin password to make changes:');
+  if (pass === ADMIN_PASS) { adminUnlocked = true; showToast('🔓 Admin mode unlocked'); fn(); renderAdminStatus(); }
+  else if (pass !== null) { showToast('❌ Incorrect password'); }
+}
+function lockAdmin() {
+  adminUnlocked = false;
+  showToast('🔒 Admin mode locked');
+  renderAdminStatus();
+  renderAll();
+}
+function renderAdminStatus() {
+  const btn = document.getElementById('admin-btn');
+  if (!btn) return;
+  if (adminUnlocked) {
+    btn.textContent = '🔓 Admin';
+    btn.style.color = 'var(--green)';
+    btn.style.borderColor = 'var(--green)';
+  } else {
+    btn.textContent = '🔒 Admin';
+    btn.style.color = 'var(--muted)';
+    btn.style.borderColor = 'var(--border)';
+  }
+}
+
+function loadLocal() {
+  try { const s=JSON.parse(localStorage.getItem('ts26v3')||'{}'); R=s.R||{}; P=s.P||{}; PAID=s.PAID||{}; } catch(e){}
+}
+function saveLocal() { localStorage.setItem('ts26v3', JSON.stringify({R,P,PAID})); }
+function isPaid(p) { return p in PAID ? PAID[p] : PLAYERS.find(x=>x.id===p).paid; }
+function togglePaid(p) {
+  requireAdmin(() => { PAID[p] = !isPaid(p); saveLocal(); if(syncCfg) syncPush(); renderAll(); });
+}
+function isOut(n) { return Object.values(R).some(r=>r.loser===n); }
+function earned(p) { return P[p]||0; }
+function aliveCount(p) { return TEAMS.filter(t=>t.o===p&&!isOut(t.n)).length; }
+function potential(p) {
+  let tot=0;
+  TEAMS.filter(t=>t.o===p&&!isOut(t.n)).forEach(t=>{
+    MS.forEach((m,i)=>{
+      if(!R[i]){
+        if(m.tA===t.n) tot+=bid(m.tB);
+        else if(m.tB===t.n) tot+=bid(m.tA);
+      }
+    });
+  });
+  return tot;
+}
+
+// ===== SYNC =====
+async function syncPush() {
+  if(!syncCfg) return;
+  try {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${syncCfg.id}`,{
+      method:'PUT', headers:{'Content-Type':'application/json','X-Master-Key':syncCfg.key},
+      body:JSON.stringify({R,P,PAID})
+    });
+    setSyncStatus(res.ok?'live':'error', res.ok?'Synced':'Push failed');
+    if(res.ok) saveLocal();
+  } catch(e) { setSyncStatus('error','Offline'); }
+}
+async function syncPull() {
+  if(!syncCfg) return;
+  try {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${syncCfg.id}/latest`,{
+      headers:{'X-Master-Key':syncCfg.key}
+    });
+    if(!res.ok){ setSyncStatus('error','Pull failed'); return; }
+    const data = await res.json();
+    const remote = data.record||{};
+    const h = JSON.stringify(remote);
+    if(h!==lastHash){ lastHash=h; R=remote.R||{}; P=remote.P||{}; PAID=remote.PAID||{}; saveLocal(); renderAll(); setSyncStatus('live','Live — synced'); }
+    else setSyncStatus('live','Live');
+  } catch(e){ setSyncStatus('error','Offline'); }
+}
+function setSyncStatus(s,msg){
+  document.getElementById('sync-dot').className='sync-dot'+(s==='live'?' live':s==='error'?' error':'');
+  document.getElementById('sync-label').textContent=msg;
+}
+function startSync(){
+  if(!syncCfg) return;
+  setSyncStatus('','Connecting...');
+  syncPull();
+  if(syncIv) clearInterval(syncIv);
+  syncIv=setInterval(syncPull,8000);
+}
+function saveSyncConfig(){
+  const id=document.getElementById('bin-id').value.trim();
+  const key=document.getElementById('api-key').value.trim();
+  if(!id||!key){alert('Enter both Bin ID and Master Key');return;}
+  syncCfg={id,key};
+  localStorage.setItem('ts26sync',JSON.stringify(syncCfg));
+  document.getElementById('disconnect-btn').style.display='';
+  startSync();
+}
+function clearSyncConfig(){
+  if(!confirm('Disconnect sync?')) return;
+  syncCfg=null; localStorage.removeItem('ts26sync');
+  if(syncIv){clearInterval(syncIv);syncIv=null;}
+  setSyncStatus('','Local only');
+  document.getElementById('disconnect-btn').style.display='none';
+}
+function toggleSyncBanner(){
+  const b=document.getElementById('sync-banner');
+  b.style.display=b.style.display==='none'?'block':'none';
+  if(syncCfg){
+    document.getElementById('bin-id').value=syncCfg.id||'';
+    document.getElementById('api-key').value=syncCfg.key||'';
+    document.getElementById('disconnect-btn').style.display='';
+  }
+}
+
+// ===== GAME LOGIC =====
+function pickWinner(idx,winner){
+  requireAdmin(()=>{
+    const m=MS[idx]; const loser=m.tA===winner?m.tB:m.tA;
+    R[idx]={winner,loser}; P[owner(winner)]=(P[owner(winner)]||0)+bid(loser);
+    saveLocal(); if(syncCfg) syncPush(); renderAll();
+  });
+}
+function undoResult(idx){
+  requireAdmin(()=>{
+    const r=R[idx]; if(!r) return;
+    P[owner(r.winner)]=Math.max(0,(P[owner(r.winner)]||0)-bid(r.loser));
+    delete R[idx]; saveLocal(); if(syncCfg) syncPush(); renderAll();
+  });
+}
+function doExport(){
+  const txt=JSON.stringify({R,P},null,2);
+  navigator.clipboard.writeText(txt).then(()=>alert('State copied to clipboard!')).catch(()=>prompt('Copy this:',txt));
+}
+function toggleImport(){
+  requireAdmin(()=>{
+    const w=document.getElementById('import-wrap');
+    w.style.display=w.style.display==='none'?'block':'none';
+  });
+}
+function doImport(){
+  requireAdmin(()=>{
+    try{
+      const p=JSON.parse(document.getElementById('import-txt').value);
+      R=p.R||{}; P=p.P||{}; PAID=p.PAID||{}; saveLocal(); if(syncCfg) syncPush(); renderAll();
+      document.getElementById('import-wrap').style.display='none';
+      alert('Imported!');
+    }catch(e){alert('Invalid JSON');}
+  });
+}
+function doReset(){
+  requireAdmin(()=>{
+    if(!confirm('Reset ALL results and payouts?')) return;
+    R={}; P={}; saveLocal(); if(syncCfg) syncPush(); renderAll();
+  });
+}
+
+// ===== RENDER =====
+function renderAll(){
+  renderTicker(); renderLeaderboard(); renderStandings();
+  renderTeams(); renderBracket(); renderLog();
+  renderHistory();
+}
+function renderTicker(){
+  const banked=Object.values(P).reduce((a,b)=>a+b,0);
+  document.getElementById('t-banked').textContent='$'+banked.toFixed(2);
+  document.getElementById('t-inplay').textContent='$'+(480-banked).toFixed(2);
+  document.getElementById('t-alive').textContent=TEAMS.filter(t=>!isOut(t.n)).length;
+}
+function sortedPlayers(){
+  return PLAYERS.map(p=>({...p,banked:earned(p.id),left:aliveCount(p.id),pot:potential(p.id),spent:TEAMS.filter(t=>t.o===p.id).reduce((a,t)=>a+t.b,0)}))
+    .sort((a,b)=>b.banked-a.banked||b.left-a.left);
+}
+function renderLeaderboard(){
+  const pl=sortedPlayers();
+  const med=['🥇','🥈','🥉'];
+  document.getElementById('leaderboard').innerHTML=pl.map((p,i)=>{
+    const c=COLORS[p.id]||'#888';
+    const pct=p.spent?Math.min(100,(p.banked/p.spent)*100):0;
+    return `<div class="pc ${i<3?'r'+(i+1):''}" onclick="showModal('${p.id}')">
+      <div class="rb">${i<3?med[i]+' ':''} #${i+1}</div>
+      <div class="pc-name" style="color:${c}">${p.id}</div>
+      <div class="paid-pill ${isPaid(p.id)?'paid-y':'paid-n'}" onclick="event.stopPropagation();togglePaid('${p.id}')" style="cursor:pointer" title="Click to toggle">${isPaid(p.id)?'✓ Paid':'● Unpaid'}</div>
+      <div class="pc-stats">
+        <div class="pst"><div class="lbl">Banked</div><div class="v" style="color:var(--green)">$${p.banked.toFixed(2)}</div></div>
+        <div class="pst"><div class="lbl">Teams</div><div class="v">${p.left}/8</div></div>
+        <div class="pst"><div class="lbl">Potential</div><div class="v" style="color:var(--accent2)">$${p.pot.toFixed(2)}</div></div>
+      </div>
+      <div class="prog"><div class="prog-fill" style="width:${pct.toFixed(1)}%;background:${c}"></div></div>
+    </div>`;
+  }).join('');
+}
+function renderStandings(){
+  document.getElementById('stand-body').innerHTML=sortedPlayers().map((p,i)=>{
+    const c=COLORS[p.id]||'#888';
+    return `<tr>
+      <td style="font-family:'DM Mono',monospace;color:var(--muted)">${i+1}</td>
+      <td><span style="font-size:16px;font-weight:800;color:${c}">${p.id}</span></td>
+      <td style="font-family:'DM Mono',monospace">${p.left} <span style="color:var(--muted);font-size:11px">left</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--green)">$${p.banked.toFixed(2)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:13px;color:var(--blue)">$${p.pot.toFixed(2)}</td>
+      <td><span class="paid-pill ${isPaid(p.id)?'paid-y':'paid-n'}" onclick="togglePaid('${p.id}')" style="cursor:pointer" title="Click to toggle">${isPaid(p.id)?'✓ Paid':'● Unpaid'}</span></td>
+    </tr>`;
+  }).join('');
+}
+function renderTeams(){
+  document.getElementById('teams-list').innerHTML=PLAYERS.map(p=>{
+    const pt=TEAMS.filter(t=>t.o===p.id);
+    const c=COLORS[p.id]||'#888';
+    return `<div class="pb">
+      <div class="pbh" onclick="toggleBlk('b${p.id}',this)">
+        <div style="width:10px;height:10px;border-radius:50%;background:${c};flex-shrink:0"></div>
+        <div class="name">${p.id}</div>
+        <div class="stat">Alive: <span>${aliveCount(p.id)}/8</span></div>
+        <div class="stat">Spent: <span>$${pt.reduce((a,t)=>a+t.b,0)}</span></div>
+        <div class="stat">Earned: <span style="color:var(--green)">$${earned(p.id).toFixed(2)}</span></div>
+        <div class="tog">▾</div>
+      </div>
+      <div id="b${p.id}" style="display:none">
+        <table class="tt"><thead><tr>
+          <th>Seed</th><th>Team</th><th>Bid</th><th>Status</th><th>Next Win $</th>
+        </tr></thead><tbody>
+          ${pt.map(t=>{
+            const out=isOut(t.n);
+            const mi=MS.findIndex((m,i)=>(m.tA===t.n||m.tB===t.n)&&!R[i]);
+            const opp=mi>=0?bid(MS[mi].tA===t.n?MS[mi].tB:MS[mi].tA):0;
+            return `<tr>
+              <td><span class="sb">#${t.s}</span></td>
+              <td style="font-weight:600;color:${out?'var(--muted)':'var(--text)'};text-decoration:${out?'line-through':'none'}">${t.n}</td>
+              <td style="font-family:'DM Mono',monospace;color:var(--accent2)">$${t.b}</td>
+              <td style="font-size:12px;color:${out?'var(--red)':'var(--green)'}">${out?'⬤ Out':'⬤ Active'}</td>
+              <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--blue)">${!out&&opp?'$'+opp:'—'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody></table>
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleBlk(id,hdr){
+  const el=document.getElementById(id),tog=hdr.querySelector('.tog'),open=el.style.display==='none';
+  el.style.display=open?'block':'none'; tog.classList.toggle('open',open);
+}
+// School colors for all 2026 tournament teams
+const SCHOOL_COLORS = {
+  // EAST
+  'DUKE':          {primary:'#003087',secondary:'#FFFFFF',name:'Duke Blue Devils'},
+  'SIENA':         {primary:'#006338',secondary:'#FFC72C',name:'Siena Saints'},
+  'OHIO ST':       {primary:'#BB0000',secondary:'#666666',name:'Ohio State Buckeyes'},
+  'TCU':           {primary:'#4D1979',secondary:'#A3A3A3',name:'TCU Horned Frogs'},
+  'ST. JOHNS':     {primary:'#CC0000',secondary:'#FFFFFF',name:"St. John's Red Storm"},
+  'NORTHERN IOWA': {primary:'#4B116F',secondary:'#FFCC00',name:'Northern Iowa Panthers'},
+  'KANSAS':        {primary:'#0051A5',secondary:'#E8000D',name:'Kansas Jayhawks'},
+  'CA BAPTIST':    {primary:'#003087',secondary:'#C8A951',name:'Cal Baptist Lancers'},
+  'LOUISVILLE':    {primary:'#AD0000',secondary:'#000000',name:'Louisville Cardinals'},
+  'SOUTH FLORIDA': {primary:'#006747',secondary:'#CFC493',name:'South Florida Bulls'},
+  'MICH ST':       {primary:'#18453B',secondary:'#FFFFFF',name:'Michigan State Spartans'},
+  'N DAKOTA ST':   {primary:'#0A5640',secondary:'#FFC72C',name:'North Dakota State Bison'},
+  'UCLA':          {primary:'#2D68C4',secondary:'#F2A900',name:'UCLA Bruins'},
+  'UCF':           {primary:'#BA9B37',secondary:'#000000',name:'UCF Knights'},
+  'UCONN':         {primary:'#000E2F',secondary:'#E4D5B7',name:'UConn Huskies'},
+  'FURMAN':        {primary:'#582C83',secondary:'#FFFFFF',name:'Furman Paladins'},
+  // WEST
+  'ARIZONA':       {primary:'#CC0033',secondary:'#003366',name:'Arizona Wildcats'},
+  'LONG ISLAND':   {primary:'#00437A',secondary:'#FFFFFF',name:'LIU Sharks'},
+  'VILLANOVA':     {primary:'#00205B',secondary:'#13B5EA',name:'Villanova Wildcats'},
+  'UTAH ST':       {primary:'#00263A',secondary:'#8B7536',name:'Utah State Aggies'},
+  'WISCONSIN':     {primary:'#C5050C',secondary:'#FFFFFF',name:'Wisconsin Badgers'},
+  'HIGH POINT':    {primary:'#4B0082',secondary:'#FFFFFF',name:'High Point Panthers'},
+  'ARKANSAS':      {primary:'#9D2235',secondary:'#FFFFFF',name:'Arkansas Razorbacks'},
+  "HAWAI'I":       {primary:'#024731',secondary:'#C8A951',name:"Hawai'i Rainbow Warriors"},
+  'BYU':           {primary:'#002E5D',secondary:'#FFFFFF',name:'BYU Cougars'},
+  'TEXAS':         {primary:'#BF5700',secondary:'#FFFFFF',name:'Texas Longhorns'},
+  'GONZAGA':       {primary:'#002469',secondary:'#CC0000',name:'Gonzaga Bulldogs'},
+  'KENNESAW ST':   {primary:'#FDBB30',secondary:'#000000',name:'Kennesaw State Owls'},
+  'MIAMI':         {primary:'#F47321',secondary:'#005030',name:'Miami Hurricanes'},
+  'MISSOURI':      {primary:'#F1B82D',secondary:'#000000',name:'Missouri Tigers'},
+  'PURDUE':        {primary:'#CEB888',secondary:'#000000',name:'Purdue Boilermakers'},
+  'QUEENS':        {primary:'#4B0082',secondary:'#C0C0C0',name:'Queens Royals'},
+  // MIDWEST
+  'MICHIGAN':      {primary:'#00274C',secondary:'#FFCB05',name:'Michigan Wolverines'},
+  'HOWARD':        {primary:'#003A63',secondary:'#E51937',name:'Howard Bison'},
+  'GEORGIA':       {primary:'#BA0C2F',secondary:'#000000',name:'Georgia Bulldogs'},
+  'ST LOUIS':      {primary:'#003DA5',secondary:'#FFFFFF',name:'Saint Louis Billikens'},
+  'TEXAS TECH':    {primary:'#CC0000',secondary:'#000000',name:'Texas Tech Red Raiders'},
+  'AKRON':         {primary:'#041E42',secondary:'#A89968',name:'Akron Zips'},
+  'ALABAMA':       {primary:'#9E1B32',secondary:'#FFFFFF',name:'Alabama Crimson Tide'},
+  'HOFSTRA':       {primary:'#00B5E2',secondary:'#003087',name:'Hofstra Pride'},
+  'TENNESSEE':     {primary:'#FF8200',secondary:'#FFFFFF',name:'Tennessee Volunteers'},
+  'SMU/MIAMI OH':  {primary:'#354CA1',secondary:'#CC0000',name:'SMU / Miami OH'},
+  'VIRGINIA':      {primary:'#232D4B',secondary:'#F84C1E',name:'Virginia Cavaliers'},
+  'WRIGHT ST':     {primary:'#006C3E',secondary:'#FFFFFF',name:'Wright State Raiders'},
+  'KENTUCKY':      {primary:'#0033A0',secondary:'#FFFFFF',name:'Kentucky Wildcats'},
+  'SANTA CLARA':   {primary:'#862633',secondary:'#A08050',name:'Santa Clara Broncos'},
+  'IOWA ST':       {primary:'#C8102E',secondary:'#F1BE48',name:'Iowa State Cyclones'},
+  'TENNESSE ST':   {primary:'#00539F',secondary:'#FFFFFF',name:'Tennessee State Tigers'},
+  // SOUTH
+  'FLORIDA':       {primary:'#0021A5',secondary:'#FA4616',name:'Florida Gators'},
+  'LEHIGH/PV':     {primary:'#8B4513',secondary:'#5B2D8E',name:'Lehigh / Prairie View'},
+  'CLEMSON':       {primary:'#F66733',secondary:'#522D80',name:'Clemson Tigers'},
+  'IOWA':          {primary:'#FFCD00',secondary:'#000000',name:'Iowa Hawkeyes'},
+  'VANDERBILT':    {primary:'#866D4B',secondary:'#000000',name:'Vanderbilt Commodores'},
+  'MCNEESE':       {primary:'#0057A8',secondary:'#FFC72C',name:'McNeese Cowboys'},
+  'NEBRASKA':      {primary:'#E41C38',secondary:'#FFFFFF',name:'Nebraska Cornhuskers'},
+  'TROY':          {primary:'#8B0000',secondary:'#C0C0C0',name:'Troy Trojans'},
+  'NORTH CAROLINA':{primary:'#4B9CD3',secondary:'#FFFFFF',name:'North Carolina Tar Heels'},
+  'VCU':           {primary:'#FFD100',secondary:'#000000',name:'VCU Rams'},
+  'ILLINOIS':      {primary:'#E84A27',secondary:'#13294B',name:'Illinois Fighting Illini'},
+  'PENN':          {primary:'#011F5B',secondary:'#990000',name:'Penn Quakers'},
+  'ST MARYS':      {primary:'#002147',secondary:'#8B0000',name:"Saint Mary's Gaels"},
+  'TEXAS A&M':     {primary:'#500000',secondary:'#FFFFFF',name:'Texas A&M Aggies'},
+  'HOUSTON':       {primary:'#C8102E',secondary:'#FFFFFF',name:'Houston Cougars'},
+  'IDAHO':         {primary:'#B3A369',secondary:'#000000',name:'Idaho Vandals'},
+};
+
+function teamColor(name) {
+  return SCHOOL_COLORS[name]?.primary || '#555';
+}
+function teamName(name) {
+  return SCHOOL_COLORS[name]?.name || name;
+}
+
+// ESPN schedule cache — pre-seeded with known R64 schedule, ESPN live data overrides
+let espnSchedule = {
+  // EAST — Thu Mar 19
+  'DUKE_SIENA':           {dateStr:'Thu Mar 19', timeStr:'1:50 PM CT', network:'CBS', liveStr:'', finalStr:''},
+  'SIENA_DUKE':           {dateStr:'Thu Mar 19', timeStr:'1:50 PM CT', network:'CBS', liveStr:'', finalStr:''},
+  'OHIO ST_TCU':          {dateStr:'Thu Mar 19', timeStr:'11:15 AM CT', network:'TBS', liveStr:'', finalStr:''},
+  'TCU_OHIO ST':          {dateStr:'Thu Mar 19', timeStr:'11:15 AM CT', network:'TBS', liveStr:'', finalStr:''},
+  'ST. JOHNS_NORTHERN IOWA': {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'NORTHERN IOWA_ST. JOHNS': {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'KANSAS_CA BAPTIST':    {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'CA BAPTIST_KANSAS':    {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'LOUISVILLE_SOUTH FLORIDA': {dateStr:'Thu Mar 19', timeStr:'12:30 PM CT', network:'TNT', liveStr:'', finalStr:''},
+  'SOUTH FLORIDA_LOUISVILLE': {dateStr:'Thu Mar 19', timeStr:'12:30 PM CT', network:'TNT', liveStr:'', finalStr:''},
+  'MICH ST_N DAKOTA ST':  {dateStr:'Thu Mar 19', timeStr:'3:05 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'N DAKOTA ST_MICH ST':  {dateStr:'Thu Mar 19', timeStr:'3:05 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'UCLA_UCF':             {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'UCF_UCLA':             {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'UCONN_FURMAN':         {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'FURMAN_UCONN':         {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  // WEST — Thu/Fri
+  'ARIZONA_LONG ISLAND':  {dateStr:'Fri Mar 20', timeStr:'12:35 PM CT', network:'CBS', liveStr:'', finalStr:''},
+  'LONG ISLAND_ARIZONA':  {dateStr:'Fri Mar 20', timeStr:'12:35 PM CT', network:'CBS', liveStr:'', finalStr:''},
+  'VILLANOVA_UTAH ST':    {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'UTAH ST_VILLANOVA':    {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'WISCONSIN_HIGH POINT': {dateStr:'Thu Mar 19', timeStr:'12:50 PM CT', network:'truTV', liveStr:'', finalStr:''},
+  'HIGH POINT_WISCONSIN': {dateStr:'Thu Mar 19', timeStr:'12:50 PM CT', network:'truTV', liveStr:'', finalStr:''},
+  "ARKANSAS_HAWAI'I":     {dateStr:'Thu Mar 19', timeStr:'3:25 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  "HAWAI'I_ARKANSAS":     {dateStr:'Thu Mar 19', timeStr:'3:25 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'BYU_TEXAS':            {dateStr:'Thu Mar 19', timeStr:'6:25 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'TEXAS_BYU':            {dateStr:'Thu Mar 19', timeStr:'6:25 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'GONZAGA_KENNESAW ST':  {dateStr:'Thu Mar 19', timeStr:'9:00 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'KENNESAW ST_GONZAGA':  {dateStr:'Thu Mar 19', timeStr:'9:00 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'MIAMI_MISSOURI':       {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'MISSOURI_MIAMI':       {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'PURDUE_QUEENS':        {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'QUEENS_PURDUE':        {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  // MIDWEST — Thu/Fri
+  'MICHIGAN_HOWARD':      {dateStr:'Thu Mar 19', timeStr:'6:10 PM CT', network:'TNT', liveStr:'', finalStr:''},
+  'HOWARD_MICHIGAN':      {dateStr:'Thu Mar 19', timeStr:'6:10 PM CT', network:'TNT', liveStr:'', finalStr:''},
+  'GEORGIA_ST LOUIS':     {dateStr:'Thu Mar 19', timeStr:'8:45 PM CT', network:'TNT', liveStr:'', finalStr:''},
+  'ST LOUIS_GEORGIA':     {dateStr:'Thu Mar 19', timeStr:'8:45 PM CT', network:'TNT', liveStr:'', finalStr:''},
+  'TEXAS TECH_AKRON':     {dateStr:'Fri Mar 20', timeStr:'11:40 AM CT', network:'CBS', liveStr:'', finalStr:''},
+  'AKRON_TEXAS TECH':     {dateStr:'Fri Mar 20', timeStr:'11:40 AM CT', network:'CBS', liveStr:'', finalStr:''},
+  'ALABAMA_HOFSTRA':      {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'HOFSTRA_ALABAMA':      {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'TENNESSEE_SMU/MIAMI OH': {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'SMU/MIAMI OH_TENNESSEE': {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'VIRGINIA_WRIGHT ST':   {dateStr:'Fri Mar 20', timeStr:'12:50 PM CT', network:'truTV', liveStr:'', finalStr:''},
+  'WRIGHT ST_VIRGINIA':   {dateStr:'Fri Mar 20', timeStr:'12:50 PM CT', network:'truTV', liveStr:'', finalStr:''},
+  'KENTUCKY_SANTA CLARA': {dateStr:'Fri Mar 20', timeStr:'11:15 AM CT', network:'CBS', liveStr:'', finalStr:''},
+  'SANTA CLARA_KENTUCKY': {dateStr:'Fri Mar 20', timeStr:'11:15 AM CT', network:'CBS', liveStr:'', finalStr:''},
+  'IOWA ST_TENNESSE ST':  {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'TENNESSE ST_IOWA ST':  {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  // SOUTH — Thu/Fri
+  'FLORIDA_LEHIGH/PV':    {dateStr:'Thu Mar 19', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'LEHIGH/PV_FLORIDA':    {dateStr:'Thu Mar 19', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'CLEMSON_IOWA':         {dateStr:'Thu Mar 19', timeStr:'11:40 AM CT', network:'CBS', liveStr:'', finalStr:''},
+  'IOWA_CLEMSON':         {dateStr:'Thu Mar 19', timeStr:'11:40 AM CT', network:'CBS', liveStr:'', finalStr:''},
+  'VANDERBILT_MCNEESE':   {dateStr:'Thu Mar 19', timeStr:'2:15 PM CT', network:'CBS', liveStr:'', finalStr:''},
+  'MCNEESE_VANDERBILT':   {dateStr:'Thu Mar 19', timeStr:'2:15 PM CT', network:'CBS', liveStr:'', finalStr:''},
+  'NEBRASKA_TROY':        {dateStr:'Thu Mar 19', timeStr:'11:40 AM CT', network:'truTV', liveStr:'', finalStr:''},
+  'TROY_NEBRASKA':        {dateStr:'Thu Mar 19', timeStr:'11:40 AM CT', network:'truTV', liveStr:'', finalStr:''},
+  'NORTH CAROLINA_VCU':   {dateStr:'Thu Mar 19', timeStr:'5:50 PM CT', network:'CBS', liveStr:'', finalStr:''},
+  'VCU_NORTH CAROLINA':   {dateStr:'Thu Mar 19', timeStr:'5:50 PM CT', network:'CBS', liveStr:'', finalStr:''},
+  'ILLINOIS_PENN':        {dateStr:'Thu Mar 19', timeStr:'8:25 PM CT', network:'CBS', liveStr:'', finalStr:''},
+  'PENN_ILLINOIS':        {dateStr:'Thu Mar 19', timeStr:'8:25 PM CT', network:'CBS', liveStr:'', finalStr:''},
+  'ST MARYS_TEXAS A&M':   {dateStr:'Thu Mar 19', timeStr:'6:35 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'TEXAS A&M_ST MARYS':   {dateStr:'Thu Mar 19', timeStr:'6:35 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'HOUSTON_IDAHO':        {dateStr:'Thu Mar 19', timeStr:'9:10 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'IDAHO_HOUSTON':        {dateStr:'Thu Mar 19', timeStr:'9:10 PM CT', network:'TBS', liveStr:'', finalStr:''},
+};
+
+async function tryFetch(url) {
+  const proxies = [
+    async()=>{const r=await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}&t=${Date.now()}`,{cache:'no-store'});const j=await r.json();return JSON.parse(j.contents);},
+    async()=>{const r=await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`,{cache:'no-store'});return await r.json();},
+    async()=>{const r=await fetch(url,{cache:'no-store'});return await r.json();},
+  ];
+  for(const proxy of proxies){
+    try{
+      const result=await Promise.race([proxy(),new Promise((_,r)=>setTimeout(()=>r(new Error('t')),7000))]);
+      if(result?.events!==undefined||result?.content) return result;
+    }catch(e){continue;}
+  }
+  return null;
+}
+
+function processESPNEvents(events) {
+  (events||[]).forEach(game=>{
+    const comp=game.competitions?.[0];
+    const comps=comp?.competitors||[];
+    if(comps.length<2) return;
+    const nameA=espnName(comps[0].team?.displayName||comps[0].team?.shortDisplayName||'');
+    const nameB=espnName(comps[1].team?.displayName||comps[1].team?.shortDisplayName||'');
+    if(!nameA||!nameB) return;
+
+    const startTime=game.date?new Date(game.date):null;
+    const status=game.status?.type?.name||'';
+    const completed=game.status?.type?.completed||false;
+    const scoreA=comps[0].score||'0', scoreB=comps[1].score||'0';
+    const abbrA=comps[0].team?.abbreviation||nameA;
+    const abbrB=comps[1].team?.abbreviation||nameB;
+
+    let dateStr='',timeStr='',network='',liveStr='',finalStr='';
+    if(startTime){
+      dateStr=startTime.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',timeZone:'America/Chicago'});
+      timeStr=startTime.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/Chicago'}).replace(':00','').replace(' AM',' AM').replace(' PM',' PM')+' CT';
+    }
+    const broadcasts=comp?.broadcasts||[];
+    network=broadcasts.flatMap(b=>b.names||[]).join(', ')||
+            (comp?.geoBroadcasts||[]).map(b=>b.media?.shortName||'').filter(Boolean).join(', ')||'';
+
+    if(completed){
+      finalStr=`${abbrA} ${scoreA} – ${scoreB} ${abbrB}`;
+    } else if(status==='STATUS_IN_PROGRESS'||status==='STATUS_HALFTIME'){
+      const clock=game.status?.displayClock||'';
+      const period=game.status?.period||0;
+      const half=status==='STATUS_HALFTIME'?'Half':period===1?'1st H':period===2?'2nd H':'';
+      liveStr=`${abbrA} ${scoreA} – ${scoreB} ${abbrB} · ${clock} ${half}`;
+    }
+
+    const info={dateStr,timeStr,network,liveStr,finalStr,completed};
+    espnSchedule[nameA+'_'+nameB]=info;
+    espnSchedule[nameB+'_'+nameA]=info;
+  });
+}
+
+async function fetchBracketSchedule() {
+  // Fetch multiple days around the tournament (Mar 19 – Apr 7)
+  const dates = [];
+  const base = new Date('2026-03-19');
+  for(let i=0;i<20;i++){
+    const d=new Date(base); d.setDate(base.getDate()+i);
+    dates.push(d.toISOString().slice(0,10).replace(/-/g,''));
+  }
+
+  // Always fetch today + tomorrow first for live/upcoming, then fill in the rest
+  const today=new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const tomorrow=new Date(Date.now()+86400000).toISOString().slice(0,10).replace(/-/g,'');
+  const priorityDates=[...new Set([today,tomorrow,...dates])];
+
+  let fetched=0;
+  for(const date of priorityDates){
+    if(fetched>=6) break; // limit requests
+    const url=`https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?groups=100&limit=100&dates=${date}`;
+    const data=await tryFetch(url);
+    if(data?.events?.length>0){
+      processESPNEvents(data.events);
+      fetched++;
+    }
+  }
+  renderBracket();
+}
+
+function getGameInfo(tA,tB){
+  return espnSchedule[tA+'_'+tB]||espnSchedule[tB+'_'+tA]||null;
+}
+
+function renderBracket(){
+  const regions=['East','West','Midwest','South'];
+  document.getElementById('bracket-wrap').innerHTML=regions.map(reg=>{
+    const ms=MS.map((m,i)=>({...m,i})).filter(m=>m.r===reg);
+    const regDone=ms.filter(m=>R[m.i]).length;
+    return `
+    <div style="margin-bottom:40px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div style="width:5px;height:22px;background:${RC[reg]};border-radius:3px"></div>
+        <div style="font-size:16px;font-weight:800;color:${RC[reg]};text-transform:uppercase;letter-spacing:1.5px">${reg}</div>
+        <div style="font-size:12px;color:var(--muted);font-weight:400">${regDone}/${ms.length} played</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+        ${ms.map(m=>{
+          const rv=R[m.i];
+          const oA=owner(m.tA),oB=owner(m.tB);
+          const ownerCA=COLORS[oA]||'#888',ownerCB=COLORS[oB]||'#888';
+          const schoolCA=teamColor(m.tA),schoolCB=teamColor(m.tB);
+          const wA=rv&&rv.winner===m.tA,wB=rv&&rv.winner===m.tB;
+          const gi=getGameInfo(m.tA,m.tB);
+          const isLive=!!gi?.liveStr;
+          const isDone=!!gi?.finalStr||wA||wB;
+
+          return `
+          <div style="background:var(--bg2);border:1px solid ${isLive?'var(--red)':isDone?'var(--border)':'var(--border2)'};border-radius:14px;overflow:hidden;${isLive?'box-shadow:0 0 0 1px rgba(255,77,109,.2)':''}">
+
+            <!-- Game meta: date / time / network / live score -->
+            <div style="padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;min-height:36px">
+              ${isLive ? `
+                <div style="display:flex;align-items:center;gap:6px">
+                  <span style="width:7px;height:7px;border-radius:50%;background:var(--red);display:inline-block;animation:pulse 1s infinite"></span>
+                  <span style="font-size:12px;font-weight:700;color:var(--red)">LIVE</span>
+                  <span style="font-size:12px;font-weight:700;color:var(--text)">${gi.liveStr}</span>
+                </div>
+              ` : gi?.finalStr ? `
+                <div style="font-size:12px;color:var(--muted)">Final: <strong style="color:var(--text)">${gi.finalStr}</strong></div>
+              ` : gi?.dateStr ? `
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <span style="font-size:12px;color:var(--text);font-weight:600">${gi.dateStr}</span>
+                  ${gi.timeStr?`<span style="font-size:12px;color:var(--accent2);font-weight:600">${gi.timeStr}</span>`:''}
+                </div>
+              ` : `<span style="font-size:11px;color:var(--muted)">Schedule TBD</span>`}
+              ${gi?.network?`<span style="font-size:11px;font-weight:700;color:var(--blue);background:rgba(78,168,255,.12);padding:3px 8px;border-radius:6px;letter-spacing:.5px">${gi.network}</span>`:''}
+            </div>
+
+            <!-- Team A row -->
+            <div style="display:flex;align-items:stretch;opacity:${wB?.45:1}">
+              <div style="width:5px;background:${wA?'var(--green)':schoolCA};flex-shrink:0"></div>
+              <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:14px 14px;background:${wA?'rgba(61,214,140,.04)':''}">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="font-size:11px;font-family:'DM Mono',monospace;font-weight:600;color:var(--muted);background:var(--bg4);padding:3px 7px;border-radius:5px;min-width:24px;text-align:center">${m.sA}</span>
+                  <div>
+                    <div style="font-size:14px;font-weight:700;color:${wA?'var(--green)':'var(--text)'}">${m.tA} ${wA?'✓':''}</div>
+                    <div style="font-size:11px;color:${ownerCA};margin-top:1px;font-weight:600">${oA}</div>
+                  </div>
+                </div>
+                <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2)">$${bid(m.tA)}</div>
+              </div>
+            </div>
+
+            <!-- VS divider -->
+            <div style="height:1px;background:var(--border);margin-left:5px"></div>
+
+            <!-- Team B row -->
+            <div style="display:flex;align-items:stretch;opacity:${wA?.45:1}">
+              <div style="width:5px;background:${wB?'var(--green)':schoolCB};flex-shrink:0"></div>
+              <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:14px 14px;background:${wB?'rgba(61,214,140,.04)':''}">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="font-size:11px;font-family:'DM Mono',monospace;font-weight:600;color:var(--muted);background:var(--bg4);padding:3px 7px;border-radius:5px;min-width:24px;text-align:center">${m.sB}</span>
+                  <div>
+                    <div style="font-size:14px;font-weight:700;color:${wB?'var(--green)':'var(--text)'}">${m.tB} ${wB?'✓':''}</div>
+                    <div style="font-size:11px;color:${ownerCB};margin-top:1px;font-weight:600">${oB}</div>
+                  </div>
+                </div>
+                <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2)">$${bid(m.tB)}</div>
+              </div>
+            </div>
+
+            <!-- Winner entry / result footer -->
+            <div style="padding:10px 14px;border-top:1px solid var(--border);background:var(--bg3)">
+              ${rv ? `
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                  <span style="font-size:12px;color:var(--green);font-weight:600">✓ ${rv.winner} — ${owner(rv.winner)} earned $${bid(rv.loser).toFixed(2)}</span>
+                  <button onclick="editResult(${m.i})" style="background:var(--bg4);border:1px solid var(--border);color:var(--blue);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-family:'Syne',sans-serif;font-weight:600">✎ Edit</button>
+                </div>
+              ` : `
+                <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                  <span style="font-size:11px;color:var(--muted);flex-shrink:0">Winner:</span>
+                  <button onclick="pickWinner(${m.i},'${m.tA}')" style="flex:1;background:var(--bg4);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-family:'Syne',sans-serif;font-weight:700;display:flex;align-items:center;gap:6px" onmouseover="this.style.borderColor='${schoolCA}';this.style.color='${schoolCA}'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">
+                    <span style="width:3px;height:14px;background:${schoolCA};border-radius:2px;flex-shrink:0"></span>${m.tA}
+                  </button>
+                  <button onclick="pickWinner(${m.i},'${m.tB}')" style="flex:1;background:var(--bg4);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-family:'Syne',sans-serif;font-weight:700;display:flex;align-items:center;gap:6px" onmouseover="this.style.borderColor='${schoolCB}';this.style.color='${schoolCB}'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">
+                    <span style="width:3px;height:14px;background:${schoolCB};border-radius:2px;flex-shrink:0"></span>${m.tB}
+                  </button>
+                </div>
+              `}
+            </div>
+
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderLog(){
+  const rawEntries=Object.entries(R);
+  const no=document.getElementById('no-log'), le=document.getElementById('log-entries');
+  if(!rawEntries.length){no.style.display='block';le.innerHTML='';return;}
+  no.style.display='none';
+  le.innerHTML=rawEntries.map(([i,rv])=>{
+    const m=MS[i]; const e={reg:m.r,winner:rv.winner,loser:rv.loser,wo:owner(rv.winner),earned:bid(rv.loser),mi:parseInt(i)};
+    return `<div class="log-entry">
+    <div>
+      <span style="color:${COLORS[e.wo]||'#888'};font-weight:700">${e.wo}</span>
+      <span style="color:var(--muted)"> earned </span>
+      <span style="color:var(--green);font-family:'DM Mono',monospace">+$${e.earned}</span>
+      <span style="color:var(--muted)"> — ${e.winner} beat ${e.loser}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:11px;color:${RC[e.reg]||'var(--purple)'}">${e.reg}</span>
+      <button onclick="editResult(${e.mi})" style="background:var(--bg4);border:1px solid var(--border);color:var(--blue);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px;font-family:'Syne',sans-serif">✎ Edit</button>
+    </div>
+  </div>`;}).join('');
+}
+function showModal(pid){
+  const pt=TEAMS.filter(t=>t.o===pid);
+  const c=COLORS[pid]||'#888';
+  document.getElementById('modal-body').innerHTML=`
+    <div style="font-size:22px;font-weight:800;color:${c};margin-bottom:16px">${pid}</div>
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      ${[['Banked','$'+earned(pid).toFixed(2),'var(--green)'],['Spent','$'+pt.reduce((a,t)=>a+t.b,0),'var(--text)'],['Potential','$'+potential(pid).toFixed(2),'var(--blue)']].map(([l,v,vc])=>`
+      <div style="background:var(--bg3);border-radius:10px;padding:12px 16px;flex:1;min-width:90px">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">${l}</div>
+        <div style="font-size:20px;font-weight:700;color:${vc};font-family:'DM Mono',monospace">${v}</div>
+      </div>`).join('')}
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr>${['Seed','Team','Bid','Status'].map(h=>`<th style="text-align:left;padding:6px 4px;color:var(--muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border)">${h}</th>`).join('')}</tr></thead>
+      <tbody>${pt.map(t=>{const out=isOut(t.n);return`<tr>
+        <td style="padding:8px 4px"><span class="sb">#${t.s}</span></td>
+        <td style="padding:8px 4px;font-weight:600;color:${out?'var(--muted)':c};text-decoration:${out?'line-through':'none'}">${t.n}</td>
+        <td style="padding:8px 4px;font-family:'DM Mono',monospace;color:var(--accent2)">$${t.b}</td>
+        <td style="padding:8px 4px;font-size:12px;color:${out?'var(--red)':'var(--green)'}">${out?'Out':'Active'}</td>
+      </tr>`;}).join('')}</tbody>
+    </table>`;
+  document.getElementById('modal').classList.add('open');
+}
+function showTab(name,btn){
+  document.querySelectorAll('.tabs').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+// ===== ESPN AUTO-SYNC =====
+// Map ESPN team names → our internal names
+const ESPN_MAP = {
+  'Duke':'DUKE','Siena':'SIENA',
+  'Ohio State':'OHIO ST','Ohio St':'OHIO ST','TCU':'TCU',
+  "St. John's":'ST. JOHNS',"Saint John's":'ST. JOHNS',
+  'Northern Iowa':'NORTHERN IOWA',
+  'Kansas':'KANSAS','Cal Baptist':'CA BAPTIST','California Baptist':'CA BAPTIST',
+  'Louisville':'LOUISVILLE','South Florida':'SOUTH FLORIDA','USF':'SOUTH FLORIDA',
+  'Michigan State':'MICH ST','Michigan St':'MICH ST','North Dakota State':'N DAKOTA ST','North Dakota St':'N DAKOTA ST',
+  'UCLA':'UCLA','UCF':'UCF',
+  'UConn':'UCONN','Connecticut':'UCONN','Furman':'FURMAN',
+  'Arizona':'ARIZONA','LIU':'LONG ISLAND','Long Island University':'LONG ISLAND',
+  'Villanova':'VILLANOVA','Utah State':'UTAH ST','Utah St':'UTAH ST',
+  'Wisconsin':'WISCONSIN','High Point':'HIGH POINT',
+  'Arkansas':'ARKANSAS',"Hawai'i":'HAWAI\'I','Hawaii':'HAWAI\'I',
+  'BYU':'BYU','Texas':'TEXAS',
+  'Gonzaga':'GONZAGA','Kennesaw State':'KENNESAW ST','Kennesaw St':'KENNESAW ST',
+  'Miami':'MIAMI','Missouri':'MISSOURI',
+  'Purdue':'PURDUE','Queens':'QUEENS',
+  'Michigan':'MICHIGAN','Howard':'HOWARD',
+  'Georgia':'GEORGIA','Saint Louis':'ST LOUIS','St. Louis':'ST LOUIS',
+  'Texas Tech':'TEXAS TECH','Akron':'AKRON',
+  'Alabama':'ALABAMA','Hofstra':'HOFSTRA',
+  'Tennessee':'TENNESSEE','SMU':'SMU/MIAMI OH','Miami (OH)':'SMU/MIAMI OH','Miami (Ohio)':'SMU/MIAMI OH',
+  'Virginia':'VIRGINIA','Wright State':'WRIGHT ST','Wright St':'WRIGHT ST',
+  'Kentucky':'KENTUCKY','Santa Clara':'SANTA CLARA',
+  'Iowa State':'IOWA ST','Iowa St':'IOWA ST','Tennessee State':'TENNESSE ST','Tennessee St':'TENNESSE ST',
+  'Florida':'FLORIDA','Lehigh':'LEHIGH/PV','Prairie View':'LEHIGH/PV','Prairie View A&M':'LEHIGH/PV',
+  'Clemson':'CLEMSON','Iowa':'IOWA',
+  'Vanderbilt':'VANDERBILT','McNeese':'MCNEESE','McNeese State':'MCNEESE',
+  'Nebraska':'NEBRASKA','Troy':'TROY',
+  'North Carolina':'NORTH CAROLINA','UNC':'NORTH CAROLINA','VCU':'VCU',
+  'Illinois':'ILLINOIS','Penn':'PENN','Pennsylvania':'PENN',
+  "Saint Mary's":'ST MARYS',"St. Mary's":'ST MARYS','Texas A&M':'TEXAS A&M',
+  'Houston':'HOUSTON','Idaho':'IDAHO',
+};
+
+function espnName(raw) {
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  if (ESPN_MAP[trimmed]) return ESPN_MAP[trimmed];
+  // fuzzy: try uppercase contains match
+  const up = trimmed.toUpperCase();
+  for (const [k,v] of Object.entries(ESPN_MAP)) {
+    if (up.includes(k.toUpperCase()) || k.toUpperCase().includes(up)) return v;
+  }
+  return null;
+}
+
+let espnIv = null;
+let lastESPNCheck = 0;
+let espnError = false;
+
+// Silent background poll — auto-applies new results, updates status indicator
+async function pollESPN(silent = true) {
+  const statusEl = document.getElementById('espn-status');
+  const statusDot = document.getElementById('espn-dot');
+  const checkBtn = document.querySelector('[onclick="pollESPN(false)"]');
+
+  if (checkBtn) checkBtn.disabled = true;
+  if (!silent) {
+    if (statusEl) statusEl.textContent = 'Checking ESPN...';
+    if (statusDot) { statusDot.style.background='var(--accent2)'; statusDot.style.animation='pulse 1s infinite'; }
+  }
+
+  // ESPN scoreboard URL — try multiple proxy approaches for Safari compatibility
+  const espnUrl = 'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?groups=100&limit=100';
+
+  const proxies = [
+    // allorigins — most Safari-friendly
+    async () => {
+      const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(espnUrl)}&timestamp=${Date.now()}`, {cache:'no-store'});
+      const j = await r.json();
+      return JSON.parse(j.contents);
+    },
+    // corsproxy.io
+    async () => {
+      const r = await fetch(`https://corsproxy.io/?${encodeURIComponent(espnUrl)}`, {cache:'no-store'});
+      return await r.json();
+    },
+    // thingproxy
+    async () => {
+      const r = await fetch(`https://thingproxy.freeboard.io/fetch/${espnUrl}`, {cache:'no-store'});
+      return await r.json();
+    },
+    // direct (works if opened via a server or Chrome)
+    async () => {
+      const r = await fetch(espnUrl, {cache:'no-store'});
+      return await r.json();
+    },
+  ];
+
+  let data = null;
+  for (const proxy of proxies) {
+    try {
+      const result = await Promise.race([proxy(), new Promise((_,r) => setTimeout(() => r(new Error('timeout')), 8000))]);
+      if (result && result.events && result.events.length >= 0) { data = result; break; }
+    } catch(e) { continue; }
+  }
+
+  if (checkBtn) checkBtn.disabled = false;
+
+  if (!data) {
+    espnError = true;
+    if (statusEl) statusEl.textContent = 'ESPN unavailable — will retry in 60s';
+    if (statusDot) { statusDot.style.background='var(--red)'; statusDot.style.animation='none'; }
+    return 0;
+  }
+
+  espnError = false;
+  const completed = (data.events || []).filter(g => g.status?.type?.completed === true);
+  let applied = 0;
+
+  for (const game of completed) {
+    const comps = game.competitions?.[0]?.competitors || [];
+    if (comps.length < 2) continue;
+    const teamA = comps[0], teamB = comps[1];
+    const nameA = espnName(teamA.team?.displayName || teamA.team?.shortDisplayName);
+    const nameB = espnName(teamB.team?.displayName || teamB.team?.shortDisplayName);
+    if (!nameA || !nameB) continue;
+
+    const scoreA = parseInt(teamA.score) || 0;
+    const scoreB = parseInt(teamB.score) || 0;
+    const winnerName = scoreA > scoreB ? nameA : nameB;
+    const loserName  = scoreA > scoreB ? nameB : nameA;
+
+    const mi = MS.findIndex(m =>
+      (m.tA === nameA && m.tB === nameB) || (m.tA === nameB && m.tB === nameA)
+    );
+    if (mi < 0 || R[mi]) continue;
+
+    R[mi] = {winner: winnerName, loser: loserName};
+    P[owner(winnerName)] = (P[owner(winnerName)]||0) + bid(loserName);
+    applied++;
+  }
+
+  if (applied > 0) {
+    saveLocal();
+    if (syncCfg) syncPush();
+    renderAll();
+    showToast(`⚡ ${applied} new result${applied>1?'s':''} applied!`);
+  }
+
+  lastESPNCheck = Date.now();
+  const now = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  if (statusEl) statusEl.textContent = `Live · last synced ${now} · ${completed.length} games found`;
+  if (statusDot) { statusDot.style.background='var(--green)'; statusDot.style.animation='pulse 2s infinite'; }
+  return applied;
+}
+
+function startESPNPoll() {
+  pollESPN(false);
+  if (espnIv) clearInterval(espnIv);
+  espnIv = setInterval(() => pollESPN(true), 60000);
+}
+
+function stopESPNPoll() {
+  if (espnIv) { clearInterval(espnIv); espnIv = null; }
+  const statusEl = document.getElementById('espn-status');
+  const statusDot = document.getElementById('espn-dot');
+  if (statusEl) statusEl.textContent = 'Auto-sync paused';
+  if (statusDot) { statusDot.style.background='var(--muted)'; statusDot.style.animation='none'; }
+}
+
+function toggleESPNPoll() {
+  const btn = document.getElementById('espn-toggle-btn');
+  if (espnIv) {
+    stopESPNPoll();
+    btn.textContent = '▶ Resume Auto-Sync';
+    btn.style.background = 'var(--bg4)';
+    btn.style.color = 'var(--muted)';
+  } else {
+    startESPNPoll();
+    btn.textContent = '⏸ Pause Auto-Sync';
+    btn.style.background = 'var(--green)';
+    btn.style.color = '#000';
+  }
+}
+
+// Toast notification
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--green);color:var(--green);padding:10px 20px;border-radius:30px;font-size:13px;font-weight:600;z-index:999;transition:opacity .4s;pointer-events:none;font-family:\'Syne\',sans-serif;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._hide);
+  t._hide = setTimeout(() => { t.style.opacity = '0'; }, 3500);
+}
+
+// Edit result modal — lets you flip the winner or clear a result
+function editResult(mi) {
+  requireAdmin(()=>{
+    const m = MS[mi];
+    const rv = R[mi];
+    const oA = owner(m.tA), oB = owner(m.tB);
+    const cA = COLORS[oA]||'#888', cB = COLORS[oB]||'#888';
+    document.getElementById('modal-body').innerHTML = `
+      <div style="font-size:17px;font-weight:800;margin-bottom:6px">Edit Result</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:20px">${m.r} · #${m.sA} vs #${m.sB}</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Select the correct winner</div>
+      <div onclick="applyEditResult(${mi},'${m.tA}')" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:2px solid ${rv&&rv.winner===m.tA?'var(--green)':'var(--border)'};border-radius:10px;margin-bottom:8px;cursor:pointer;background:${rv&&rv.winner===m.tA?'rgba(61,214,140,0.08)':'var(--bg3)'};transition:all .15s">
+        <span><span style="color:${cA};font-weight:700;font-size:15px">${m.tA}</span> <span style="color:var(--muted);font-size:12px">· ${oA} · $${bid(m.tA)}</span></span>
+        ${rv&&rv.winner===m.tA?'<span style="color:var(--green);font-size:12px">✓ Current winner</span>':''}
+      </div>
+      <div onclick="applyEditResult(${mi},'${m.tB}')" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:2px solid ${rv&&rv.winner===m.tB?'var(--green)':'var(--border)'};border-radius:10px;margin-bottom:16px;cursor:pointer;background:${rv&&rv.winner===m.tB?'rgba(61,214,140,0.08)':'var(--bg3)'};transition:all .15s">
+        <span><span style="color:${cB};font-weight:700;font-size:15px">${m.tB}</span> <span style="color:var(--muted);font-size:12px">· ${oB} · $${bid(m.tB)}</span></span>
+        ${rv&&rv.winner===m.tB?'<span style="color:var(--green);font-size:12px">✓ Current winner</span>':''}
+      </div>
+      ${rv ? `<button onclick="clearResult(${mi})" style="width:100%;background:var(--bg4);border:1px solid var(--border);color:var(--red);padding:10px;border-radius:8px;cursor:pointer;font-family:'Syne',sans-serif;font-size:13px;font-weight:600">✕ Clear this result entirely</button>` : ''}
+    `;
+    document.getElementById('modal').classList.add('open');
+  });
+}
+
+function applyEditResult(mi, winner) {
+  const rv = R[mi];
+  if (rv) { P[owner(rv.winner)] = Math.max(0, (P[owner(rv.winner)]||0) - bid(rv.loser)); }
+  const m = MS[mi];
+  const loser = m.tA === winner ? m.tB : m.tA;
+  R[mi] = {winner, loser};
+  P[owner(winner)] = (P[owner(winner)]||0) + bid(loser);
+  saveLocal(); if(syncCfg) syncPush(); renderAll();
+  document.getElementById('modal').classList.remove('open');
+  showToast(`✓ Result updated: ${winner} wins`);
+}
+
+function clearResult(mi) {
+  const rv = R[mi]; if(!rv) return;
+  P[owner(rv.winner)] = Math.max(0, (P[owner(rv.winner)]||0) - bid(rv.loser));
+  delete R[mi];
+  saveLocal(); if(syncCfg) syncPush(); renderAll();
+  document.getElementById('modal').classList.remove('open');
+  showToast('Result cleared');
+}
+
+// ===== AUCTION =====
+const A_TEAMS_ALL = [
+  {n:'Duke',r:'East',s:1},{n:'UConn',r:'East',s:2},{n:'Michigan State',r:'East',s:3},{n:'Kansas',r:'East',s:4},
+  {n:'St. Johns',r:'East',s:5},{n:'Louisville',r:'East',s:6},{n:'UCLA',r:'East',s:7},{n:'Ohio State',r:'East',s:8},
+  {n:'TCU',r:'East',s:9},{n:'UCF',r:'East',s:10},{n:'South Florida',r:'East',s:11},{n:'Northern Iowa',r:'East',s:12},
+  {n:'Cal Baptist',r:'East',s:13},{n:'North Dakota State',r:'East',s:14},
+  {n:'Arizona',r:'West',s:1},{n:'Purdue',r:'West',s:2},{n:'Gonzaga',r:'West',s:3},{n:'Arkansas',r:'West',s:4},
+  {n:'Wisconsin',r:'West',s:5},{n:'BYU',r:'West',s:6},{n:'Miami',r:'West',s:7},{n:'Villanova',r:'West',s:8},
+  {n:'Utah State',r:'West',s:9},{n:'Missouri',r:'West',s:10},{n:'Texas',r:'West',s:11},{n:'High Point',r:'West',s:12},
+  {n:'Hawaii',r:'West',s:13},{n:'Kennesaw State',r:'West',s:14},
+  {n:'Michigan',r:'Midwest',s:1},{n:'Iowa State',r:'Midwest',s:2},{n:'Virginia',r:'Midwest',s:3},{n:'Alabama',r:'Midwest',s:4},
+  {n:'Texas Tech',r:'Midwest',s:5},{n:'Tennessee',r:'Midwest',s:6},{n:'Kentucky',r:'Midwest',s:7},{n:'Georgia',r:'Midwest',s:8},
+  {n:'Saint Louis',r:'Midwest',s:9},{n:'Santa Clara',r:'Midwest',s:10},{n:'SMU/Miami OH',r:'Midwest',s:11},{n:'Akron',r:'Midwest',s:12},
+  {n:'Hofstra',r:'Midwest',s:13},{n:'Wright State',r:'Midwest',s:14},
+  {n:'Florida',r:'South',s:1},{n:'Houston',r:'South',s:2},{n:'Illinois',r:'South',s:3},{n:'Nebraska',r:'South',s:4},
+  {n:'Vanderbilt',r:'South',s:5},{n:'North Carolina',r:'South',s:6},{n:'Saint Marys',r:'South',s:7},{n:'Clemson',r:'South',s:8},
+  {n:'Iowa',r:'South',s:9},{n:'Texas A&M',r:'South',s:10},{n:'VCU',r:'South',s:11},{n:'McNeese',r:'South',s:12},
+  {n:'Troy',r:'South',s:13},{n:'Penn',r:'South',s:14},
+];
+const A_SEEDS_15_16 = [
+  {n:'Furman',r:'East',s:15},{n:'Siena',r:'East',s:16},
+  {n:'Queens',r:'West',s:15},{n:'Long Island',r:'West',s:16},
+  {n:'Tennessee State',r:'Midwest',s:15},{n:'Howard',r:'Midwest',s:16},
+  {n:'Idaho',r:'South',s:15},{n:'Lehigh/PV',r:'South',s:16},
+];
+
+let A = {
+  players:[],phase:'setup',prepickIdx:0,prepickDone:0,nominatorIdx:0,
+  item:null,currentBid:0,currentBidder:null,passed:[],takenTeams:[],log:[]
+};
+function aSave(){ localStorage.setItem('ts26auction',JSON.stringify(A)); }
+function aLoad(){ try{const s=JSON.parse(localStorage.getItem('ts26auction')||'null');if(s)A=s;}catch(e){} }
+function aRem(p){ return +(p.budget-p.picks.reduce((s,pk)=>s+pk.bid,0)).toFixed(2); }
+function aSL(p){ return p.spots-p.picks.length; }
+function aMax(p){ const sl=aSL(p);if(sl<=0)return 0;return Math.max(0.5,+(aRem(p)-(sl-1)*0.5).toFixed(2)); }
+function aCanBid(p){ return !A.passed.includes(p.name)&&aSL(p)>0&&aMax(p)>=+(A.currentBid+0.5).toFixed(2); }
+
+function renderAuctionSetup(){
+  const el=document.getElementById('auction-player-setup');if(!el)return;
+  el.innerHTML=A.players.map((p,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 14px">
+      <div style="flex:1;min-width:0">
+        <input value="${p.name}" oninput="A.players[${i}].name=this.value;aSave()"
+          style="background:none;border:none;color:var(--text);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;width:100%">
+        <div style="font-size:11px;color:var(--muted);margin-top:3px;display:flex;gap:10px">
+          <span>$<input type="number" value="${p.budget}" min="1" step="0.5" oninput="A.players[${i}].budget=+this.value;aSave()"
+            style="background:none;border:none;color:var(--accent2);font-family:'DM Mono',monospace;font-size:11px;width:36px"> budget</span>
+          <span><input type="number" value="${p.spots}" min="1" max="20" oninput="A.players[${i}].spots=+this.value;aSave()"
+            style="background:none;border:none;color:var(--accent2);font-family:'DM Mono',monospace;font-size:11px;width:24px"> teams</span>
+        </div>
+      </div>
+      <button onclick="A.players.splice(${i},1);aSave();renderAuctionSetup()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px">×</button>
+    </div>`).join('')||'<div style="color:var(--muted);font-size:13px">No players yet.</div>';
+}
+
+function addAuctionPlayer(){
+  const name=document.getElementById('new-player-name').value.trim();if(!name)return;
+  A.players.push({name,budget:parseFloat(document.getElementById('new-player-budget').value)||60,spots:parseInt(document.getElementById('new-player-spots').value)||8,picks:[]});
+  document.getElementById('new-player-name').value='';
+  aSave();renderAuctionSetup();
+}
+
+function startAuction(){
+  if(A.players.length<1){alert('Add at least one player.');return;}
+  A.players.forEach(p=>{p.picks=[];});
+  A.log=[];A.takenTeams=[];A.passed=[];A.item=null;A.currentBid=0;A.currentBidder=null;
+  A.prepickIdx=0;A.prepickDone=0;A.nominatorIdx=0;
+  A.phase=A_SEEDS_15_16.length>0?'prepick':'nominate';
+  aSave();
+  document.getElementById('auction-setup').style.display='none';
+  document.getElementById('auction-live').style.display='block';
+  renderAuctionLive();
+}
+
+function resetAuction(){
+  if(!confirm('Reset auction? Clears all picks and bids.'))return;
+  A={players:A.players.map(p=>({...p,picks:[]})),log:[],phase:'setup',prepickIdx:0,prepickDone:0,
+     nominatorIdx:0,item:null,currentBid:0,currentBidder:null,passed:[],takenTeams:[]};
+  aSave();
+  document.getElementById('auction-setup').style.display='block';
+  document.getElementById('auction-live').style.display='none';
+  renderAuctionSetup();
+}
+
+function renderAuctionLive(){
+  renderABudgets();renderAItemCard();renderABidControls();renderAPrepick();renderANominate();renderALog();
+}
+
+function renderABudgets(){
+  const el=document.getElementById('auction-budgets');if(!el)return;
+  el.innerHTML=A.players.map(p=>{
+    const rem=aRem(p),sl=aSL(p),mx=aMax(p),spent=+(p.budget-rem).toFixed(2),pct=Math.min(100,(spent/p.budget)*100);
+    const isBidder=A.currentBidder===p.name,isPassed=A.passed.includes(p.name);
+    const cantBid=A.phase==='bidding'&&!aCanBid(p)&&!isBidder;
+    const col=rem<5?'var(--red)':rem<15?'var(--accent2)':'var(--green)';
+    return `<div class="a-budget-card" style="border-color:${isBidder?'var(--green)':'var(--border)'};${isBidder?'box-shadow:0 0 0 2px rgba(61,214,140,.2);':''}opacity:${cantBid?.45:1}">
+      <div class="a-budget-name">${p.name}${isBidder?' 🏆':''}${isPassed&&A.phase==='bidding'?' <span style="color:var(--red);font-size:9px">PASS</span>':''}</div>
+      <div class="a-budget-left" style="color:${col}">$${rem.toFixed(2)}</div>
+      <div class="a-budget-spots">${sl} spot${sl!==1?'s':''} left · ${p.picks.length} picked</div>
+      <div class="a-budget-maxbid">max $${mx.toFixed(2)}</div>
+      <div style="margin-top:5px;height:3px;background:var(--bg4);border-radius:2px">
+        <div style="height:100%;border-radius:2px;background:${col};width:${pct.toFixed(1)}%"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAItemCard(){
+  const el=document.getElementById('auction-item-card');if(!el)return;
+  if(!A.item){
+    if(A.phase==='done') el.innerHTML=`<div style="text-align:center;padding:24px"><div style="font-size:24px;font-weight:800;color:var(--green);margin-bottom:8px">🎉 Auction Complete!</div><div style="font-size:13px;color:var(--muted)">All teams have been drafted.</div></div>`;
+    else if(A.phase==='prepick') el.innerHTML=`<div style="text-align:center;padding:16px 0;color:var(--muted);font-size:13px">Assigning #15 &amp; #16 seeds below...</div>`;
+    else el.innerHTML=`<div style="text-align:center;padding:16px 0;color:var(--muted);font-size:13px"><strong style="color:var(--accent)">${A.players[A.nominatorIdx]?.name||''}</strong> — nominate a team below</div>`;
+    return;
+  }
+  const rc=RC[A.item.region]||'var(--muted)';
+  const stillIn=A.players.filter(p=>aCanBid(p));
+  el.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px">
+      <div>
+        <div style="font-size:11px;color:${rc};text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">${A.item.region} · Seed #${A.item.seed}</div>
+        <div style="font-size:30px;font-weight:800;letter-spacing:-0.5px">${A.item.team}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Nominated by <strong style="color:var(--text)">${A.players[A.nominatorIdx]?.name||''}</strong></div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Current bid</div>
+        <div style="font-size:38px;font-weight:800;font-family:'DM Mono',monospace;color:var(--gold)">$${A.currentBid.toFixed(2)}</div>
+        ${A.currentBidder?`<div style="font-size:13px;color:var(--green);font-weight:700">${A.currentBidder} is winning</div>`:'<div style="font-size:13px;color:var(--muted)">No bids yet</div>'}
+      </div>
+    </div>
+    <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+      <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-right:2px">Bidders:</span>
+      ${A.players.map(p=>{
+        const passed=A.passed.includes(p.name),winning=A.currentBidder===p.name,cantBid=!aCanBid(p)&&!winning;
+        return `<span style="padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid ${winning?'var(--green)':passed?'var(--border)':'var(--border2)'};background:${winning?'rgba(61,214,140,.1)':passed?'transparent':'var(--bg3)'};color:${winning?'var(--green)':passed||cantBid?'var(--muted)':'var(--text)'};opacity:${passed||cantBid?.4:1}">${p.name}${winning?' 🏆':''}${passed?' ✗':''}</span>`;
+      }).join('')}
+    </div>
+    ${stillIn.length===0&&A.currentBidder?`
+    <div style="margin-top:14px;padding:14px;background:rgba(61,214,140,.08);border:1px solid var(--green);border-radius:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <span style="font-weight:700;color:var(--green)">🔨 ${A.item.team} → ${A.currentBidder} for $${A.currentBid.toFixed(2)}</span>
+      <button class="btn btn-green" onclick="aSold()">Confirm SOLD</button>
+    </div>`:''}`;
+}
+
+function renderABidControls(){
+  const el=document.getElementById('auction-bid-controls');if(!el)return;
+  if(!A.item||A.phase!=='bidding'){el.style.display='none';return;}
+  el.style.display='block';
+  const minNext=+(A.currentBid+0.5).toFixed(2);
+  el.innerHTML=`
+    <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--accent2)">Place a Bid</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px">
+      <div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:5px">Amount (min $${minNext.toFixed(2)})</div>
+        <input id="a-bid-amount" class="bid-input" type="number" min="${minNext}" step="0.5" value="${minNext}">
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:5px">Bidder</div>
+        <select id="a-bid-player" class="txt-input" style="min-width:140px">
+          ${A.players.map(p=>`<option value="${p.name}" ${!aCanBid(p)?'disabled':''} ${A.currentBidder===p.name?'selected':''}>${p.name} — max $${aMax(p).toFixed(2)}${A.passed.includes(p.name)?' [passed]':''}</option>`).join('')}
+        </select>
+      </div>
+      <button class="btn btn-accent" onclick="aPlaceBid()">Bid</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:600">Mark as passed:</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+      ${A.players.filter(p=>!A.passed.includes(p.name)&&p.name!==A.currentBidder).map(p=>`
+        <button onclick="aPass('${p.name}')" style="background:var(--bg4);border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:6px;cursor:pointer;font-family:'Syne',sans-serif;font-size:12px;font-weight:600">
+          ${p.name} — Pass
+        </button>`).join('')||'<span style="font-size:12px;color:var(--muted)">All other players have passed</span>'}
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:14px">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Manual override</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input id="a-override-team" class="txt-input" placeholder="Team name" value="${A.item.team}" style="max-width:180px">
+        <input id="a-override-bid" class="txt-input" type="number" placeholder="Bid" value="${A.currentBid}" style="max-width:90px" step="0.5">
+        <select id="a-override-bidder" class="txt-input" style="max-width:150px">
+          <option value="">No bidder</option>
+          ${A.players.map(p=>`<option value="${p.name}" ${A.currentBidder===p.name?'selected':''}>${p.name}</option>`).join('')}
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="aOverride()">Apply</button>
+      </div>
+    </div>`;
+}
+
+function renderAPrepick(){
+  const el=document.getElementById('auction-prepick-panel');if(!el)return;
+  if(A.phase!=='prepick'){el.style.display='none';return;}
+  el.style.display='block';
+  const picker=document.getElementById('prepick-whose-turn');
+  if(picker) picker.textContent=A.players[A.prepickIdx]?.name||'';
+  const avail=A_SEEDS_15_16.filter(t=>!A.takenTeams.includes(t.n));
+  document.getElementById('prepick-grid').innerHTML=avail.map(t=>{
+    const rc=RC[t.r]||'#888';
+    return `<button class="team-btn" onclick="aPrepick('${t.n}')">
+      <div class="t-seed">#${t.s}</div><div class="t-name">${t.n}</div>
+      <div class="t-region" style="color:${rc}">${t.r}</div>
+      <div style="color:var(--muted);font-size:10px;margin-top:2px">$0.50</div>
+    </button>`;
+  }).join('')||'<div style="color:var(--green);font-size:13px">All seeds assigned!</div>';
+}
+
+function renderANominate(){
+  const el=document.getElementById('auction-nominate-panel');if(!el)return;
+  if(A.phase!=='nominate'){el.style.display='none';return;}
+  el.style.display='block';
+  const nom=document.getElementById('nominator-name');
+  if(nom) nom.textContent=A.players[A.nominatorIdx]?.name||'';
+  aFilterTeams();
+}
+
+function aFilterTeams(){
+  const grid=document.getElementById('auction-team-grid');if(!grid)return;
+  const search=(document.getElementById('team-search')?.value||'').toLowerCase();
+  const region=document.getElementById('team-region-filter')?.value||'';
+  const avail=A_TEAMS_ALL.filter(t=>{
+    if(A.takenTeams.includes(t.n))return false;
+    if(region&&t.r!==region)return false;
+    if(search&&!t.n.toLowerCase().includes(search))return false;
+    return true;
+  });
+  grid.innerHTML=avail.map(t=>{
+    const rc=RC[t.r]||'#888';
+    return `<button class="team-btn" onclick="aNominate('${t.n}')">
+      <div class="t-seed">#${t.s}</div><div class="t-name">${t.n}</div>
+      <div class="t-region" style="color:${rc}">${t.r}</div>
+    </button>`;
+  }).join('')||'<div style="color:var(--muted);font-size:13px;padding:8px">No teams available</div>';
+}
+
+function renderALog(){
+  const el=document.getElementById('auction-log');if(!el)return;
+  const undoBtn=document.getElementById('undo-pick-btn');
+  if(undoBtn) undoBtn.style.display=A.log.length?'':'none';
+  if(!A.log.length){el.innerHTML='<div style="color:var(--muted);font-size:13px">No picks yet.</div>';return;}
+  el.innerHTML=A.log.map((e,i)=>`
+    <div class="log-pick">
+      <span>
+        <span style="color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;margin-right:6px">#${A.log.length-i}</span>
+        <strong>${e.player}</strong><span style="color:var(--muted)"> → </span>
+        <strong style="color:var(--text)">${e.team}</strong>
+        <span style="color:var(--muted);font-size:11px"> · #${e.seed} ${e.region}</span>
+        ${e.type==='prepick'?'<span style="color:var(--muted);font-size:10px;margin-left:4px">(pre-pick)</span>':''}
+      </span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-family:'DM Mono',monospace;color:var(--accent2)">$${e.bid.toFixed(2)}</span>
+        <button onclick="aEditLog(${i})" style="background:var(--bg4);border:1px solid var(--border);color:var(--blue);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px;font-family:'Syne',sans-serif">✎</button>
+      </div>
+    </div>`).join('');
+}
+
+function aPrepick(teamName){
+  const t=A_SEEDS_15_16.find(x=>x.n===teamName);if(!t)return;
+  const p=A.players[A.prepickIdx];
+  p.picks.push({team:teamName,bid:0.5,seed:t.s,region:t.r});
+  A.takenTeams.push(teamName);
+  A.log.unshift({player:p.name,team:teamName,bid:0.5,seed:t.s,region:t.r,type:'prepick'});
+  A.prepickDone++;
+  showToast(`${p.name} picked ${teamName} ($0.50)`);
+  if(A.prepickDone>=A_SEEDS_15_16.length){
+    A.phase='nominate';A.nominatorIdx=0;
+  } else {
+    let tries=0;
+    do{A.prepickIdx=(A.prepickIdx+1)%A.players.length;tries++;}
+    while(aSL(A.players[A.prepickIdx])===0&&tries<A.players.length);
+  }
+  aSave();renderAuctionLive();
+}
+
+function aNominate(teamName){
+  const t=A_TEAMS_ALL.find(x=>x.n===teamName);if(!t)return;
+  A.item={team:teamName,seed:t.s,region:t.r};
+  A.currentBid=0.5;A.currentBidder=A.players[A.nominatorIdx].name;
+  A.passed=[];A.phase='bidding';
+  aSave();renderAuctionLive();
+  setTimeout(()=>{const inp=document.getElementById('a-bid-amount');if(inp){inp.value=(1.0).toFixed(2);inp.select();}},60);
+}
+
+function aPlaceBid(){
+  const amt=parseFloat(document.getElementById('a-bid-amount')?.value||0);
+  const pName=document.getElementById('a-bid-player')?.value;
+  const p=A.players.find(x=>x.name===pName);
+  if(!p){showToast('Select a player');return;}
+  if(amt<+(A.currentBid+0.5).toFixed(2)){showToast(`Min bid is $${(A.currentBid+0.5).toFixed(2)}`);return;}
+  if(amt>aMax(p)){showToast(`${pName} max is $${aMax(p).toFixed(2)}`);return;}
+  A.currentBid=+amt.toFixed(2);A.currentBidder=pName;
+  A.passed=A.passed.filter(n=>n!==pName);
+  aSave();renderAuctionLive();
+  setTimeout(()=>{const inp=document.getElementById('a-bid-amount');if(inp){inp.value=(A.currentBid+0.5).toFixed(2);inp.select();}},60);
+}
+
+function aPass(playerName){
+  if(!A.passed.includes(playerName))A.passed.push(playerName);
+  aSave();renderAuctionLive();
+}
+
+function aSold(){
+  if(!A.item||!A.currentBidder)return;
+  const p=A.players.find(x=>x.name===A.currentBidder);
+  p.picks.push({team:A.item.team,bid:A.currentBid,seed:A.item.seed,region:A.item.region});
+  A.takenTeams.push(A.item.team);
+  A.log.unshift({player:A.currentBidder,team:A.item.team,bid:A.currentBid,seed:A.item.seed,region:A.item.region,type:'sold'});
+  showToast(`🔨 ${A.item.team} → ${A.currentBidder} for $${A.currentBid.toFixed(2)}!`);
+  A.item=null;A.currentBid=0;A.currentBidder=null;A.passed=[];
+  if(A.players.every(p=>aSL(p)===0)){A.phase='done';aSave();renderAuctionLive();return;}
+  A.phase='nominate';
+  let tries=0;
+  do{A.nominatorIdx=(A.nominatorIdx+1)%A.players.length;tries++;}
+  while(aSL(A.players[A.nominatorIdx])===0&&tries<A.players.length);
+  aSave();renderAuctionLive();
+}
+
+function aOverride(){
+  const team=document.getElementById('a-override-team')?.value.trim();
+  const bid=parseFloat(document.getElementById('a-override-bid')?.value||0);
+  const bidder=document.getElementById('a-override-bidder')?.value||null;
+  if(team)A.item.team=team;
+  if(!isNaN(bid)&&bid>=0)A.currentBid=+bid.toFixed(2);
+  A.currentBidder=bidder||null;
+  aSave();renderAuctionLive();showToast('Override applied');
+}
+
+function aUndoLast(){
+  if(!A.log.length)return;
+  const last=A.log.shift();
+  const p=A.players.find(x=>x.name===last.player);
+  if(p){const i=p.picks.findIndex(pk=>pk.team===last.team&&pk.bid===last.bid);if(i>=0)p.picks.splice(i,1);}
+  A.takenTeams=A.takenTeams.filter(t=>t!==last.team);
+  if(last.type==='prepick'){A.phase='prepick';A.prepickDone=Math.max(0,A.prepickDone-1);}
+  aSave();renderAuctionLive();showToast(`↩ Undid: ${last.team}`);
+}
+
+function aEditLog(idx){
+  const e=A.log[idx];if(!e)return;
+  document.getElementById('modal-body').innerHTML=`
+    <div style="font-size:17px;font-weight:800;margin-bottom:18px">Edit Pick #${A.log.length-idx}</div>
+    <div style="display:grid;gap:12px">
+      <div><div style="font-size:11px;color:var(--muted);margin-bottom:5px">Team</div>
+        <input id="el-team" class="txt-input" value="${e.team}" style="width:100%"></div>
+      <div><div style="font-size:11px;color:var(--muted);margin-bottom:5px">Bid ($)</div>
+        <input id="el-bid" class="txt-input" type="number" value="${e.bid}" step="0.5" style="width:100%"></div>
+      <div><div style="font-size:11px;color:var(--muted);margin-bottom:5px">Player</div>
+        <select id="el-player" class="txt-input" style="width:100%">
+          ${A.players.map(p=>`<option value="${p.name}" ${p.name===e.player?'selected':''}>${p.name}</option>`).join('')}
+        </select></div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button class="btn btn-accent" style="flex:1" onclick="aApplyEdit(${idx})">Save</button>
+        <button class="btn btn-red btn-sm" onclick="aDeletePick(${idx})">Delete Pick</button>
+      </div>
+    </div>`;
+  document.getElementById('modal').classList.add('open');
+}
+
+function aApplyEdit(idx){
+  const e=A.log[idx];if(!e)return;
+  const newTeam=document.getElementById('el-team').value.trim();
+  const newBid=parseFloat(document.getElementById('el-bid').value);
+  const newPlayer=document.getElementById('el-player').value;
+  const oldP=A.players.find(x=>x.name===e.player);
+  if(oldP){const i=oldP.picks.findIndex(pk=>pk.team===e.team&&pk.bid===e.bid);if(i>=0)oldP.picks.splice(i,1);}
+  A.takenTeams=A.takenTeams.filter(t=>t!==e.team);
+  const newP=A.players.find(x=>x.name===newPlayer);
+  const tInfo=[...A_TEAMS_ALL,...A_SEEDS_15_16].find(t=>t.n===newTeam)||{s:e.seed,r:e.region};
+  if(newP)newP.picks.push({team:newTeam,bid:newBid,seed:tInfo.s,region:tInfo.r});
+  A.takenTeams.push(newTeam);
+  A.log[idx]={...e,team:newTeam,bid:newBid,player:newPlayer,seed:tInfo.s,region:tInfo.r};
+  aSave();renderAuctionLive();
+  document.getElementById('modal').classList.remove('open');
+  showToast('Pick updated');
+}
+
+function aDeletePick(idx){
+  if(!confirm('Delete this pick?'))return;
+  const e=A.log[idx];
+  const p=A.players.find(x=>x.name===e.player);
+  if(p){const i=p.picks.findIndex(pk=>pk.team===e.team&&pk.bid===e.bid);if(i>=0)p.picks.splice(i,1);}
+  A.takenTeams=A.takenTeams.filter(t=>t!==e.team);
+  A.log.splice(idx,1);
+  aSave();renderAuctionLive();
+  document.getElementById('modal').classList.remove('open');
+  showToast('Pick deleted');
+}
+
+// ===== HISTORY =====
+const HISTORY = [
+  {
+    year: 2025,
+    results: [
+      {player:'SKRAEMS', banked:164},
+      {player:'DEEDS',   banked:105},
+      {player:'CUP',     banked:74.5},
+      {player:'DEWEY',   banked:68.5},
+      {player:'RICK',    banked:32},
+      {player:'BEAN',    banked:24},
+      {player:'GUAC',    banked:23},
+      {player:'JMACK',   banked:21},
+    ]
+  },
+];
+
+// 2026 is live — pull from current state
+function get2026Results() {
+  return PLAYERS.map(p => ({player:p.id, banked:earned(p.id)})).filter(r=>r.banked>0);
+}
+
+function renderHistory() {
+  const allYears = [
+    ...HISTORY,
+    {year:2026, results:get2026Results(), live:true}
+  ];
+
+  // Build all-time per player
+  const allPlayers = {};
+  allYears.forEach(yr => {
+    yr.results.forEach(r => {
+      if(!allPlayers[r.player]) allPlayers[r.player] = {years:[], total:0};
+      allPlayers[r.player].years.push({year:yr.year, banked:r.banked, live:yr.live||false});
+      allPlayers[r.player].total += r.banked;
+    });
+  });
+
+  // Sort by total
+  const sorted = Object.entries(allPlayers)
+    .map(([name,d]) => ({
+      name, total:d.total,
+      years:d.years.length,
+      avg:+(d.total/d.years.length).toFixed(2),
+      best:Math.max(...d.years.map(y=>y.banked)),
+      bestYear:d.years.find(y=>y.banked===Math.max(...d.years.map(y=>y.banked)))?.year,
+      breakdown:d.years
+    }))
+    .sort((a,b)=>b.total-a.total);
+
+  const HIST_COLORS = {
+    SKRAEMS:'#b06cff',DEEDS:'#ff6b35',CUP:'#ffd700',DEWEY:'#00d4ff',
+    RICK:'#ffad35',BEAN:'#4ea8ff',GUAC:'#3dd68c',JMACK:'#ff4d6d',
+  };
+
+  // All-time cards (mobile friendly)
+  const tbody = document.getElementById('history-alltime-body');
+  if(tbody) {
+    tbody.innerHTML = sorted.map((p,i) => {
+      const c = HIST_COLORS[p.name]||'#888';
+      const medal = i<3 ? ['🥇','🥈','🥉'][i] : '';
+      return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <div style="font-size:20px;width:28px;text-align:center;flex-shrink:0">${medal||`<span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--muted)">${i+1}</span>`}</div>
+        <div style="flex:1;min-width:120px">
+          <div style="font-size:18px;font-weight:800;color:${c}">${p.name}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${p.years} season${p.years!==1?'s':''} · Best: $${p.best.toFixed(2)} (${p.bestYear})</div>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;text-align:right">
+          <div>
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Total</div>
+            <div style="font-size:20px;font-weight:800;font-family:'DM Mono',monospace;color:var(--green)">$${p.total.toFixed(2)}</div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Avg/yr</div>
+            <div style="font-size:16px;font-weight:700;font-family:'DM Mono',monospace;color:var(--accent2)">$${p.avg.toFixed(2)}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Year-by-year cards
+  const yearsEl = document.getElementById('history-years');
+  if(yearsEl) {
+    yearsEl.innerHTML = [...allYears].reverse().map(yr => {
+      const sorted = [...yr.results].sort((a,b)=>b.banked-a.banked);
+      const winner = sorted[0];
+      const total = sorted.reduce((s,r)=>s+r.banked,0);
+      return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="font-size:22px;font-weight:800">${yr.year}</div>
+            ${yr.live?'<span style="font-size:11px;background:rgba(61,214,140,.15);color:var(--green);padding:3px 10px;border-radius:20px;font-weight:700">🔴 Live</span>':''}
+          </div>
+          <div style="font-size:13px;color:var(--muted)">
+            🏆 <strong style="color:${HIST_COLORS[winner?.player]||'#888'}">${winner?.player||'—'}</strong>
+            <span style="font-family:'DM Mono',monospace;color:var(--gold)"> $${winner?.banked?.toFixed(2)||'0'}</span>
+            <span style="margin-left:12px;color:var(--muted)">Pool: <span style="font-family:'DM Mono',monospace;color:var(--text)">$${total.toFixed(2)}</span></span>
+          </div>
+        </div>
+        <div style="padding:8px 0">
+          ${sorted.map((r,i) => {
+            const c = HIST_COLORS[r.player]||'#888';
+            const pct = winner.banked > 0 ? (r.banked/winner.banked)*100 : 0;
+            return `<div style="display:flex;align-items:center;gap:12px;padding:10px 20px">
+              <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;width:20px;text-align:right">${i+1}</div>
+              <div style="font-size:14px;font-weight:700;color:${c};width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.player}</div>
+              <div style="flex:1;background:var(--bg4);border-radius:4px;height:6px;min-width:40px">
+                <div style="height:100%;border-radius:4px;background:${c};width:${pct.toFixed(1)}%;transition:width .4s"></div>
+              </div>
+              <div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:${i===0?'var(--gold)':'var(--text)'};min-width:70px;text-align:right">$${r.banked.toFixed(2)}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ===== INIT =====
+loadLocal();
+aLoad();
+renderAll();
+renderHistory();
+renderAdminStatus();
+fetchBracketSchedule();
+setInterval(fetchBracketSchedule, 120000); // refresh schedule every 2 mins
+if(A.phase==='setup'){
+  renderAuctionSetup();
+} else {
+  document.getElementById('auction-setup').style.display='none';
+  document.getElementById('auction-live').style.display='block';
+  renderAuctionLive();
+}
+if(syncCfg) startSync();
+startESPNPoll();
+</script>
+</body>
+</html>
