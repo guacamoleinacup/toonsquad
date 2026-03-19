@@ -70,7 +70,7 @@
   .r1 .rb { background: rgba(255,215,0,.15); color: var(--gold); }
   .r2 .rb { background: rgba(192,192,192,.1); color: #c0c0c0; }
   .r3 .rb { background: rgba(205,127,50,.1); color: #cd7f32; }
-  .pc-name { font-size: 22px; font-weight: 800; letter-spacing: -.5px; margin-bottom: 4px; }
+  .pc-name { font-size: 22px; font-weight: 800; letter-spacing: -.5px; margin-bottom: 4px; padding-right: 52px; }
   .paid-pill { font-size: 11px; padding: 2px 8px; border-radius: 20px; display: inline-block; margin-bottom: 12px; }
   .paid-y { background: rgba(61,214,140,.15); color: var(--green); }
   .paid-n { background: rgba(255,77,109,.15); color: var(--red); }
@@ -783,23 +783,32 @@ function renderTeams(){
         <div class="stat">Earned: <span style="color:var(--green)">$${earned(p.id).toFixed(2)}</span></div>
         <div class="tog">▾</div>
       </div>
-      <div id="b${p.id}" style="display:none">
-        <table class="tt"><thead><tr>
-          <th>Seed</th><th>Team</th><th>Bid</th><th>Status</th><th>Next Win $</th>
-        </tr></thead><tbody>
-          ${pt.map(t=>{
-            const out=isOut(t.n);
-            const mi=MS.findIndex((m,i)=>(m.tA===t.n||m.tB===t.n)&&!R[i]);
-            const opp=mi>=0?bid(MS[mi].tA===t.n?MS[mi].tB:MS[mi].tA):0;
-            return `<tr>
-              <td><span class="sb">#${t.s}</span></td>
-              <td style="font-weight:600;color:${out?'var(--muted)':'var(--text)'};text-decoration:${out?'line-through':'none'}">${t.n}</td>
-              <td style="font-family:'DM Mono',monospace;color:var(--accent2)">$${t.b}</td>
-              <td style="font-size:12px;color:${out?'var(--red)':'var(--green)'}">${out?'⬤ Out':'⬤ Active'}</td>
-              <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--blue)">${!out&&opp?'$'+opp:'—'}</td>
-            </tr>`;
-          }).join('')}
-        </tbody></table>
+      <div id="b${p.id}" style="display:none;padding:8px 12px 12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;margin-bottom:4px">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;flex:1">Team</div>
+          <div style="display:flex;gap:10px;flex-shrink:0;margin-left:8px">
+            <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;min-width:28px;text-align:right">Bid</span>
+            <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;min-width:42px;text-align:right">Status</span>
+            <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;min-width:28px;text-align:right">Next $</span>
+          </div>
+        </div>
+        ${pt.map(t=>{
+          const out=isOut(t.n);
+          const mi=MS.findIndex((m,i)=>(m.tA===t.n||m.tB===t.n)&&!R[i]);
+          const opp=mi>=0?bid(MS[mi].tA===t.n?MS[mi].tB:MS[mi].tA):0;
+          const sc=teamColor(t.n);
+          return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;margin-bottom:6px;background:var(--bg3);border-radius:8px;border-left:3px solid ${out?'var(--red)':sc};opacity:${out?.6:1}">
+            <div style="display:flex;align-items:center;gap:8px;min-width:0">
+              <span class="sb" style="flex-shrink:0">#${t.s}</span>
+              <span style="font-weight:600;font-size:13px;color:${out?'var(--muted)':'var(--text)'};text-decoration:${out?'line-through':'none'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.n}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:8px">
+              <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent2)">$${t.b}</span>
+              <span style="font-size:11px;color:${out?'var(--red)':'var(--green)'}">${out?'Out':'Active'}</span>
+              <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--blue);min-width:28px;text-align:right">${!out&&opp?'$'+opp:'—'}</span>
+            </div>
+          </div>`;
+        }).join('')}
       </div>
     </div>`;
   }).join('');
@@ -894,23 +903,23 @@ let espnSchedule = {
   'SIENA_DUKE':           {dateStr:'Thu Mar 19', timeStr:'1:50 PM CT', network:'CBS', liveStr:'', finalStr:''},
   'OHIO ST_TCU':          {dateStr:'Thu Mar 19', timeStr:'11:15 AM CT', network:'TBS', liveStr:'', finalStr:''},
   'TCU_OHIO ST':          {dateStr:'Thu Mar 19', timeStr:'11:15 AM CT', network:'TBS', liveStr:'', finalStr:''},
-  'ST. JOHNS_NORTHERN IOWA': {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
-  'NORTHERN IOWA_ST. JOHNS': {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
-  'KANSAS_CA BAPTIST':    {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
-  'CA BAPTIST_KANSAS':    {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'ST. JOHNS_NORTHERN IOWA': {dateStr:'Fri Mar 20', timeStr:'6:10 PM CT', network:'CBS', liveStr:'', finalStr:''},
+  'NORTHERN IOWA_ST. JOHNS': {dateStr:'Fri Mar 20', timeStr:'6:10 PM CT', network:'CBS', liveStr:'', finalStr:''},
+  'KANSAS_CA BAPTIST':    {dateStr:'Fri Mar 20', timeStr:'8:45 PM CT', network:'CBS', liveStr:'', finalStr:''},
+  'CA BAPTIST_KANSAS':    {dateStr:'Fri Mar 20', timeStr:'8:45 PM CT', network:'CBS', liveStr:'', finalStr:''},
   'LOUISVILLE_SOUTH FLORIDA': {dateStr:'Thu Mar 19', timeStr:'12:30 PM CT', network:'TNT', liveStr:'', finalStr:''},
   'SOUTH FLORIDA_LOUISVILLE': {dateStr:'Thu Mar 19', timeStr:'12:30 PM CT', network:'TNT', liveStr:'', finalStr:''},
   'MICH ST_N DAKOTA ST':  {dateStr:'Thu Mar 19', timeStr:'3:05 PM CT', network:'TBS', liveStr:'', finalStr:''},
   'N DAKOTA ST_MICH ST':  {dateStr:'Thu Mar 19', timeStr:'3:05 PM CT', network:'TBS', liveStr:'', finalStr:''},
-  'UCLA_UCF':             {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
-  'UCF_UCLA':             {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
-  'UCONN_FURMAN':         {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
-  'FURMAN_UCONN':         {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'UCLA_UCF':             {dateStr:'Fri Mar 20', timeStr:'6:25 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'UCF_UCLA':             {dateStr:'Fri Mar 20', timeStr:'6:25 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'UCONN_FURMAN':         {dateStr:'Fri Mar 20', timeStr:'9:00 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'FURMAN_UCONN':         {dateStr:'Fri Mar 20', timeStr:'9:00 PM CT', network:'TBS', liveStr:'', finalStr:''},
   // WEST — Thu/Fri
   'ARIZONA_LONG ISLAND':  {dateStr:'Fri Mar 20', timeStr:'12:35 PM CT', network:'CBS', liveStr:'', finalStr:''},
   'LONG ISLAND_ARIZONA':  {dateStr:'Fri Mar 20', timeStr:'12:35 PM CT', network:'CBS', liveStr:'', finalStr:''},
-  'VILLANOVA_UTAH ST':    {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
-  'UTAH ST_VILLANOVA':    {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'VILLANOVA_UTAH ST':    {dateStr:'Fri Mar 20', timeStr:'3:10 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'UTAH ST_VILLANOVA':    {dateStr:'Fri Mar 20', timeStr:'3:10 PM CT', network:'TBS', liveStr:'', finalStr:''},
   'WISCONSIN_HIGH POINT': {dateStr:'Thu Mar 19', timeStr:'12:50 PM CT', network:'truTV', liveStr:'', finalStr:''},
   'HIGH POINT_WISCONSIN': {dateStr:'Thu Mar 19', timeStr:'12:50 PM CT', network:'truTV', liveStr:'', finalStr:''},
   "ARKANSAS_HAWAI'I":     {dateStr:'Thu Mar 19', timeStr:'3:25 PM CT', network:'TBS', liveStr:'', finalStr:''},
@@ -919,10 +928,10 @@ let espnSchedule = {
   'TEXAS_BYU':            {dateStr:'Thu Mar 19', timeStr:'6:25 PM CT', network:'TBS', liveStr:'', finalStr:''},
   'GONZAGA_KENNESAW ST':  {dateStr:'Thu Mar 19', timeStr:'9:00 PM CT', network:'TBS', liveStr:'', finalStr:''},
   'KENNESAW ST_GONZAGA':  {dateStr:'Thu Mar 19', timeStr:'9:00 PM CT', network:'TBS', liveStr:'', finalStr:''},
-  'MIAMI_MISSOURI':       {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
-  'MISSOURI_MIAMI':       {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
-  'PURDUE_QUEENS':        {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
-  'QUEENS_PURDUE':        {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'MIAMI_MISSOURI':       {dateStr:'Fri Mar 20', timeStr:'9:10 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'MISSOURI_MIAMI':       {dateStr:'Fri Mar 20', timeStr:'9:10 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'PURDUE_QUEENS':        {dateStr:'Fri Mar 20', timeStr:'6:35 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'QUEENS_PURDUE':        {dateStr:'Fri Mar 20', timeStr:'6:35 PM CT', network:'TBS', liveStr:'', finalStr:''},
   // MIDWEST — Thu/Fri
   'MICHIGAN_HOWARD':      {dateStr:'Thu Mar 19', timeStr:'6:10 PM CT', network:'TNT', liveStr:'', finalStr:''},
   'HOWARD_MICHIGAN':      {dateStr:'Thu Mar 19', timeStr:'6:10 PM CT', network:'TNT', liveStr:'', finalStr:''},
@@ -930,16 +939,16 @@ let espnSchedule = {
   'ST LOUIS_GEORGIA':     {dateStr:'Thu Mar 19', timeStr:'8:45 PM CT', network:'TNT', liveStr:'', finalStr:''},
   'TEXAS TECH_AKRON':     {dateStr:'Fri Mar 20', timeStr:'11:40 AM CT', network:'CBS', liveStr:'', finalStr:''},
   'AKRON_TEXAS TECH':     {dateStr:'Fri Mar 20', timeStr:'11:40 AM CT', network:'CBS', liveStr:'', finalStr:''},
-  'ALABAMA_HOFSTRA':      {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
-  'HOFSTRA_ALABAMA':      {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'ALABAMA_HOFSTRA':      {dateStr:'Fri Mar 20', timeStr:'2:15 PM CT', network:'CBS', liveStr:'', finalStr:''},
+  'HOFSTRA_ALABAMA':      {dateStr:'Fri Mar 20', timeStr:'2:15 PM CT', network:'CBS', liveStr:'', finalStr:''},
   'TENNESSEE_MIAMI OH': {dateStr:'Fri Mar 20', timeStr:'3:25 PM CT', network:'CBS', liveStr:'', finalStr:''},
   'MIAMI OH_TENNESSEE': {dateStr:'Fri Mar 20', timeStr:'3:25 PM CT', network:'CBS', liveStr:'', finalStr:''},
   'VIRGINIA_WRIGHT ST':   {dateStr:'Fri Mar 20', timeStr:'12:50 PM CT', network:'truTV', liveStr:'', finalStr:''},
   'WRIGHT ST_VIRGINIA':   {dateStr:'Fri Mar 20', timeStr:'12:50 PM CT', network:'truTV', liveStr:'', finalStr:''},
   'KENTUCKY_SANTA CLARA': {dateStr:'Fri Mar 20', timeStr:'11:15 AM CT', network:'CBS', liveStr:'', finalStr:''},
   'SANTA CLARA_KENTUCKY': {dateStr:'Fri Mar 20', timeStr:'11:15 AM CT', network:'CBS', liveStr:'', finalStr:''},
-  'IOWA ST_TENNESSE ST':  {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
-  'TENNESSE ST_IOWA ST':  {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'IOWA ST_TENNESSE ST':  {dateStr:'Fri Mar 20', timeStr:'1:50 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'TENNESSE ST_IOWA ST':  {dateStr:'Fri Mar 20', timeStr:'1:50 PM CT', network:'TBS', liveStr:'', finalStr:''},
   // SOUTH — Thu/Fri
   'FLORIDA_PRAIRIE VIEW':    {dateStr:'Fri Mar 20', timeStr:'8:25 PM CT', network:'CBS', liveStr:'', finalStr:''},
   'PRAIRIE VIEW_FLORIDA':    {dateStr:'Fri Mar 20', timeStr:'8:25 PM CT', network:'CBS', liveStr:'', finalStr:''},
