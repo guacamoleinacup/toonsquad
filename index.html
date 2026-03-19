@@ -1214,27 +1214,27 @@ const ESPN_MAP = {
   'Arizona':'ARIZONA','LIU':'LONG ISLAND','Long Island University':'LONG ISLAND',
   'Villanova':'VILLANOVA','Utah State':'UTAH ST','Utah St':'UTAH ST',
   'Wisconsin':'WISCONSIN','High Point':'HIGH POINT',
-  'Arkansas':'ARKANSAS',"Hawai'i":'HAWAI\'I','Hawaii':'HAWAI\'I',
-  'BYU':'BYU','Texas':'TEXAS',
-  'Gonzaga':'GONZAGA','Kennesaw State':'KENNESAW ST','Kennesaw St':'KENNESAW ST',
-  'Miami':'MIAMI','Missouri':'MISSOURI',
-  'Purdue':'PURDUE','Queens':'QUEENS',
-  'Michigan':'MICHIGAN','Howard':'HOWARD',
-  'Georgia':'GEORGIA','Saint Louis':'ST LOUIS','St. Louis':'ST LOUIS',
-  'Texas Tech':'TEXAS TECH','Akron':'AKRON',
-  'Alabama':'ALABAMA','Hofstra':'HOFSTRA',
-  'Tennessee':'TENNESSEE','SMU':'MIAMI OH','Miami (OH)':'MIAMI OH','Miami (Ohio)':'MIAMI OH','Miami OH':'MIAMI OH',
-  'Virginia':'VIRGINIA','Wright State':'WRIGHT ST','Wright St':'WRIGHT ST',
-  'Kentucky':'KENTUCKY','Santa Clara':'SANTA CLARA',
-  'Iowa State':'IOWA ST','Iowa St':'IOWA ST','Tennessee State':'TENNESSE ST','Tennessee St':'TENNESSE ST',
-  'Florida':'FLORIDA','Lehigh':'PRAIRIE VIEW','Prairie View':'PRAIRIE VIEW','Prairie View A&M':'PRAIRIE VIEW',
-  'Clemson':'CLEMSON','Iowa':'IOWA',
-  'Vanderbilt':'VANDERBILT','McNeese':'MCNEESE','McNeese State':'MCNEESE',
-  'Nebraska':'NEBRASKA','Troy':'TROY',
-  'North Carolina':'NORTH CAROLINA','UNC':'NORTH CAROLINA','VCU':'VCU',
-  'Illinois':'ILLINOIS','Penn':'PENN','Pennsylvania':'PENN',
-  "Saint Mary's":'ST MARYS',"St. Mary's":'ST MARYS','Texas A&M':'TEXAS A&M',
-  'Houston':'HOUSTON','Idaho':'IDAHO',
+  'Arkansas':'ARKANSAS','Arkansas Razorbacks':'ARKANSAS',"Hawai'i":'HAWAI\'I','Hawaii':'HAWAI\'I',
+  'BYU':'BYU','BYU Cougars':'BYU','Texas':'TEXAS','Texas Longhorns':'TEXAS',
+  'Gonzaga':'GONZAGA','Gonzaga Bulldogs':'GONZAGA','Kennesaw State':'KENNESAW ST','Kennesaw St':'KENNESAW ST','Kennesaw State Owls':'KENNESAW ST',
+  'Miami':'MIAMI','Miami Hurricanes':'MIAMI','Missouri':'MISSOURI','Missouri Tigers':'MISSOURI',
+  'Purdue':'PURDUE','Purdue Boilermakers':'PURDUE','Queens':'QUEENS','Queens University Royals':'QUEENS',
+  'Michigan':'MICHIGAN','Michigan Wolverines':'MICHIGAN','Howard':'HOWARD','Howard Bison':'HOWARD',
+  'Georgia':'GEORGIA','Georgia Bulldogs':'GEORGIA','Saint Louis':'ST LOUIS','St. Louis':'ST LOUIS','Saint Louis Billikens':'ST LOUIS',
+  'Texas Tech':'TEXAS TECH','Texas Tech Red Raiders':'TEXAS TECH','Akron':'AKRON','Akron Zips':'AKRON',
+  'Alabama':'ALABAMA','Alabama Crimson Tide':'ALABAMA','Hofstra':'HOFSTRA','Hofstra Pride':'HOFSTRA',
+  'Tennessee':'TENNESSEE','Tennessee Volunteers':'TENNESSEE','SMU':'MIAMI OH','Miami (OH)':'MIAMI OH','Miami (Ohio)':'MIAMI OH','Miami OH':'MIAMI OH','Miami (OH) RedHawks':'MIAMI OH',
+  'Virginia':'VIRGINIA','Virginia Cavaliers':'VIRGINIA','Wright State':'WRIGHT ST','Wright St':'WRIGHT ST','Wright State Raiders':'WRIGHT ST',
+  'Kentucky':'KENTUCKY','Kentucky Wildcats':'KENTUCKY','Santa Clara':'SANTA CLARA','Santa Clara Broncos':'SANTA CLARA',
+  'Iowa State':'IOWA ST','Iowa St':'IOWA ST','Iowa State Cyclones':'IOWA ST','Tennessee State':'TENNESSE ST','Tennessee St':'TENNESSE ST','Tennessee State Tigers':'TENNESSE ST',
+  'Florida':'FLORIDA','Florida Gators':'FLORIDA','Lehigh':'PRAIRIE VIEW','Prairie View':'PRAIRIE VIEW','Prairie View A&M':'PRAIRIE VIEW','Prairie View A&M Panthers':'PRAIRIE VIEW',
+  'Clemson':'CLEMSON','Clemson Tigers':'CLEMSON','Iowa':'IOWA','Iowa Hawkeyes':'IOWA',
+  'Vanderbilt':'VANDERBILT','Vanderbilt Commodores':'VANDERBILT','McNeese':'MCNEESE','McNeese State':'MCNEESE','McNeese Cowboys':'MCNEESE',
+  'Nebraska':'NEBRASKA','Nebraska Cornhuskers':'NEBRASKA','Troy':'TROY','Troy Trojans':'TROY',
+  'North Carolina':'NORTH CAROLINA','UNC':'NORTH CAROLINA','North Carolina Tar Heels':'NORTH CAROLINA','VCU':'VCU','VCU Rams':'VCU',
+  'Illinois':'ILLINOIS','Illinois Fighting Illini':'ILLINOIS','Penn':'PENN','Pennsylvania':'PENN','Penn Quakers':'PENN',
+  "Saint Mary's":'ST MARYS',"St. Mary's":'ST MARYS',"Saint Mary's Gaels":'ST MARYS','Texas A&M':'TEXAS A&M','Texas A&M Aggies':'TEXAS A&M',
+  'Houston':'HOUSTON','Houston Cougars':'HOUSTON','Idaho':'IDAHO','Idaho Vandals':'IDAHO',
 };
 
 function espnName(raw) {
@@ -1310,8 +1310,13 @@ async function pollESPN(silent = true) {
   }
 
   espnError = false;
-  const completed = (data.events || []).filter(g => g.status?.type?.completed === true);
+  const allEvents = data.events || [];
+  const completed = allEvents.filter(g => g.status?.type?.completed === true);
   let applied = 0;
+
+  // Update live scores on bracket cards for ALL games (in-progress + completed)
+  processESPNEvents(allEvents);
+  renderBracket();
 
   for (const game of completed) {
     const comps = game.competitions?.[0]?.competitors || [];
