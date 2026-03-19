@@ -185,7 +185,6 @@
   </div>
   <div class="nav">
     <button class="nav-btn active" onclick="showTab('standings',this)">Standings</button>
-    <button class="nav-btn" onclick="showTab('teams',this)">Teams</button>
     <button class="nav-btn" onclick="showTab('bracket',this)">Bracket & Results</button>
     <button class="nav-btn" onclick="showTab('rules',this)">Rules</button>
     <button class="nav-btn" onclick="showTab('history',this)">History</button>
@@ -212,30 +211,23 @@
     <p style="font-size:11px;color:var(--muted);margin-top:10px">No account? Use <strong style="color:var(--text)">Export / Import</strong> in the Results tab to manually copy-paste state between devices.</p>
   </div>
 
-  <div class="ticker">
-    <div class="ticker-main">
-      <div class="label">Entry Fee</div>
-      <div class="val">$64</div>
-      <div style="font-size:11px;color:var(--muted)">$60 auction · $32 champ bonus · bid returned to champ</div>
-    </div>
-    <div class="ticker-items">
-      <div class="t-item"><div class="label">Banked</div><div class="val" id="t-banked" style="color:var(--green)">$0.00</div></div>
-      <div class="t-item"><div class="label">In Play</div><div class="val" id="t-inplay" style="color:var(--accent)">$512.00</div></div>
-      <div class="t-item"><div class="label">Champ Bonus</div><div class="val" style="color:var(--purple)">$32</div></div>
-      <div class="t-item"><div class="label">Teams Alive</div><div class="val" id="t-alive" style="color:var(--blue)">64</div></div>
-    </div>
-  </div>
-
   <!-- STANDINGS -->
   <div id="tab-standings" class="tabs active">
+    <div class="ticker">
+      <div class="ticker-main">
+        <div class="label">Entry Fee</div>
+        <div class="val">$64</div>
+        <div style="font-size:11px;color:var(--muted)">$60 auction · $32 champ bonus · bid returned to champ</div>
+      </div>
+      <div class="ticker-items">
+        <div class="t-item"><div class="label">Banked</div><div class="val" id="t-banked" style="color:var(--green)">$0.00</div></div>
+        <div class="t-item"><div class="label">In Play</div><div class="val" id="t-inplay" style="color:var(--accent)">$512.00</div></div>
+        <div class="t-item"><div class="label">Champ Bonus</div><div class="val" style="color:var(--purple)">$32</div></div>
+        <div class="t-item"><div class="label">Teams Alive</div><div class="val" id="t-alive" style="color:var(--blue)">64</div></div>
+      </div>
+    </div>
     <div class="section-title">Standings</div>
     <div class="lb-grid" id="stand-body"></div>
-  </div>
-
-  <!-- TEAMS -->
-  <div id="tab-teams" class="tabs">
-    <div class="section-title">All Teams by Player</div>
-    <div id="teams-list"></div>
   </div>
 
   <!-- BRACKET & RESULTS -->
@@ -446,7 +438,7 @@
 <script>
 // ===== DATA =====
 const PLAYERS = [
-  {id:'DEEDS',paid:false},{id:'BEAN',paid:true},{id:'GUAC',paid:false},{id:'SKRAEMS',paid:false},
+  {id:'DEEDS',paid:false},{id:'BEAN',paid:true},{id:'GUAC',paid:true},{id:'SKRAEMS',paid:false},
   {id:'RICK',paid:false},{id:'JMACK',paid:true},{id:'DEW',paid:true},{id:'CUP',paid:true},
 ];
 const COLORS = {DEEDS:'#ff6b35',BEAN:'#4ea8ff',GUAC:'#3dd68c',SKRAEMS:'#b06cff',RICK:'#ffad35',JMACK:'#ff4d6d',DEW:'#00d4ff',CUP:'#ffd700'};
@@ -737,7 +729,7 @@ function doReset(){
 // ===== RENDER =====
 function renderAll(){
   renderTicker(); renderStandings();
-  renderTeams(); renderBracket(); renderLog();
+  renderBracket(); renderLog();
   renderHistory(); renderAnalytics();
 }
 function renderTicker(){
@@ -757,10 +749,10 @@ function renderStandings(){
   document.getElementById('stand-body').innerHTML=pl.map((p,i)=>{
     const c=COLORS[p.id]||'#888';
     const pct=p.spent?Math.min(100,(p.banked/p.spent)*100):0;
-    return `<div class="pc ${i<3?'r'+(i+1):''}" style="cursor:default">
+    return `<div class="pc ${i<3?'r'+(i+1):''}" style="cursor:pointer" onclick="showModal('${p.id}')">
       <div class="rb">${i<3?med[i]+' ':''} #${i+1}</div>
       <div class="pc-name" style="color:${c}">${p.id}</div>
-      <div class="paid-pill ${isPaid(p.id)?'paid-y':'paid-n'}" onclick="togglePaid('${p.id}')" style="cursor:pointer" title="Click to toggle">${isPaid(p.id)?'✓ Paid':'● Unpaid'}</div>
+      <div class="paid-pill ${isPaid(p.id)?'paid-y':'paid-n'}" onclick="event.stopPropagation();togglePaid('${p.id}')" style="cursor:pointer" title="Click to toggle">${isPaid(p.id)?'✓ Paid':'● Unpaid'}</div>
       <div class="pc-stats">
         <div class="pst"><div class="lbl">Banked</div><div class="v" style="color:var(--green)">$${p.banked.toFixed(2)}</div></div>
         <div class="pst"><div class="lbl">Teams</div><div class="v">${p.left}/8</div></div>
@@ -1190,15 +1182,31 @@ function showModal(pid){
         <div style="font-size:20px;font-weight:700;color:${vc};font-family:'DM Mono',monospace">${v}</div>
       </div>`).join('')}
     </div>
-    <table style="width:100%;border-collapse:collapse;font-size:13px">
-      <thead><tr>${['Seed','Team','Bid','Status'].map(h=>`<th style="text-align:left;padding:6px 4px;color:var(--muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border)">${h}</th>`).join('')}</tr></thead>
-      <tbody>${pt.map(t=>{const out=isOut(t.n);return`<tr>
-        <td style="padding:8px 4px"><span class="sb">#${t.s}</span></td>
-        <td style="padding:8px 4px;font-weight:600;color:${out?'var(--muted)':c};text-decoration:${out?'line-through':'none'}">${t.n}</td>
-        <td style="padding:8px 4px;font-family:'DM Mono',monospace;color:var(--accent2)">$${t.b}</td>
-        <td style="padding:8px 4px;font-size:12px;color:${out?'var(--red)':'var(--green)'}">${out?'Out':'Active'}</td>
-      </tr>`;}).join('')}</tbody>
-    </table>`;
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;margin-bottom:4px">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;flex:1">Team</div>
+      <div style="display:flex;gap:10px;flex-shrink:0;margin-left:8px">
+        <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;min-width:28px;text-align:right">Bid</span>
+        <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;min-width:42px;text-align:right">Status</span>
+        <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;min-width:28px;text-align:right">Next $</span>
+      </div>
+    </div>
+    ${pt.map(t=>{
+      const out=isOut(t.n);
+      const mi=MS.findIndex((m,i)=>(m.tA===t.n||m.tB===t.n)&&!R[i]);
+      const opp=mi>=0?bid(MS[mi].tA===t.n?MS[mi].tB:MS[mi].tA):0;
+      const sc=teamColor(t.n);
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;margin-bottom:6px;background:var(--bg3);border-radius:8px;border-left:3px solid ${out?'var(--red)':sc};opacity:${out?.6:1}">
+        <div style="display:flex;align-items:center;gap:8px;min-width:0">
+          <span class="sb" style="flex-shrink:0">#${t.s}</span>
+          <span style="font-weight:600;font-size:13px;color:${out?'var(--muted)':'var(--text)'};text-decoration:${out?'line-through':'none'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.n}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:8px">
+          <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent2)">$${t.b}</span>
+          <span style="font-size:11px;color:${out?'var(--red)':'var(--green)'}">${out?'Out':'Active'}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--blue);min-width:28px;text-align:right">${!out&&opp?'$'+opp:'—'}</span>
+        </div>
+      </div>`;
+    }).join('')}`;
   document.getElementById('modal').classList.add('open');
 }
 function showTab(name,btn){
