@@ -1365,7 +1365,6 @@ async function pollESPN(silent = true) {
 }
 
 function startESPNPoll() {
-  pollESPN(false);
   if (espnIv) clearInterval(espnIv);
   espnIv = setInterval(() => pollESPN(true), 60000);
 }
@@ -2216,6 +2215,8 @@ renderAll();
 renderHistory();
 renderAnalytics();
 renderAdminStatus();
+// Fire pollESPN immediately so live/completed scores show on first load without waiting
+pollESPN(false);
 fetchBracketSchedule();
 setInterval(fetchBracketSchedule, 120000);
 if(A.phase==='setup'){
