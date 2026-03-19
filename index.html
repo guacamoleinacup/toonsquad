@@ -214,13 +214,13 @@
 
   <div class="ticker">
     <div class="ticker-main">
-      <div class="label">Auction Budget</div>
-      <div class="val">$60</div>
-      <div style="font-size:11px;color:var(--muted)">per player · $64 entry fee</div>
+      <div class="label">Entry Fee</div>
+      <div class="val">$64</div>
+      <div style="font-size:11px;color:var(--muted)">$60 auction · $32 champ bonus · bid returned to champ</div>
     </div>
     <div class="ticker-items">
       <div class="t-item"><div class="label">Banked</div><div class="val" id="t-banked" style="color:var(--green)">$0.00</div></div>
-      <div class="t-item"><div class="label">In Play</div><div class="val" id="t-inplay" style="color:var(--accent)">$480.00</div></div>
+      <div class="t-item"><div class="label">In Play</div><div class="val" id="t-inplay" style="color:var(--accent)">$512.00</div></div>
       <div class="t-item"><div class="label">Champ Bonus</div><div class="val" style="color:var(--purple)">$32</div></div>
       <div class="t-item"><div class="label">Teams Alive</div><div class="val" id="t-alive" style="color:var(--blue)">64</div></div>
     </div>
@@ -228,16 +228,8 @@
 
   <!-- STANDINGS -->
   <div id="tab-standings" class="tabs active">
-    <div class="section-title">Leaderboard</div>
-    <div class="lb-grid" id="leaderboard"></div>
-    <div class="section-title">Full Standings</div>
-    <table class="stand-table">
-      <thead><tr>
-        <th style="width:50px">#</th><th>Player</th><th>Teams Left</th>
-        <th>Banked</th><th>Remaining Potential</th><th>Status</th>
-      </tr></thead>
-      <tbody id="stand-body"></tbody>
-    </table>
+    <div class="section-title">Standings</div>
+    <div class="lb-grid" id="stand-body"></div>
   </div>
 
   <!-- TEAMS -->
@@ -263,10 +255,10 @@
     <!-- First four note -->
     <div class="ff-note" style="margin-bottom:20px">
       <strong>First Four results (March 17–18):</strong><br>
-      ✓ Howard beat UMBC 86–83 → Michigan vs <strong>Howard</strong><br>
+      ✓ Howard beat UMBC 86–83 → Michigan vs <strong>Howard</strong> (JMACK's slot)<br>
       ✓ Texas beat NC State 68–66 → BYU vs <strong>Texas</strong> (RICK's slot)<br>
-      ✓ SMU beat Miami (OH) → Tennessee vs <strong>SMU/MIAMI OH</strong> (JMACK's slot)<br>
-      ✓ Lehigh beat Prairie View A&M → Florida vs <strong>Lehigh/PV</strong> (CUP's slot)
+      ✓ Miami (OH) beat SMU 89–79 → Tennessee vs <strong>Miami (OH)</strong> (JMACK's slot)<br>
+      ✓ Prairie View beat Lehigh 67–55 → Florida vs <strong>Prairie View A&M</strong> (CUP's slot)
     </div>
 
     <!-- Bracket (click to enter results if admin) -->
@@ -302,7 +294,7 @@
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:8px;font-weight:700">🏀 Draft Rules</div>
         <div style="font-size:13px;color:var(--muted);line-height:1.7">
           • Everyone must own exactly <strong style="color:var(--text)">8 teams</strong> at the end of the auction.<br>
-          • <strong style="color:var(--text)">#15 &amp; #16 seeds</strong> are drafted randomly for <strong style="color:var(--text)">$0.50 each</strong> before bidding begins.<br>
+          • <strong style="color:var(--text)">#15 &amp; #16 seeds</strong> are picked clockwise in order for <strong style="color:var(--text)">$0.50 each</strong> before bidding begins.<br>
           • Minimum bid is <strong style="color:var(--text)">$0.50</strong>.<br>
           • Players take turns nominating a team and must bid at least $0.50 on their own nomination.<br>
           • Once you <strong style="color:var(--text)">Pass</strong> or declare done bidding on a team, you cannot jump back in.
@@ -333,6 +325,8 @@
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--purple);margin-bottom:8px;font-weight:700">🎯 Championship Bonus</div>
         <div style="font-size:13px;color:var(--muted);line-height:1.7">
           Whoever owns the <strong style="color:var(--text)">tournament champion</strong> wins an additional <strong style="color:var(--purple)">$32 bonus</strong> on top of all their regular game winnings.<br><br>
+          They also get their <strong style="color:var(--text)">original auction bid returned</strong> — since the champion is the last team standing and never "loses" to anyone, their owner gets that money back.<br><br>
+          Example: if you drafted the champion for <strong style="color:var(--text)">$20</strong>, you earn all your game winnings <strong>+ $32 bonus + $20 bid back</strong>.
           This bonus comes from the $4 extra per player in the entry fee (8 × $4 = $32).
         </div>
       </div>
@@ -475,22 +469,22 @@ const TEAMS = [
   {o:'RICK',n:'TEXAS',s:11,b:1},{o:'RICK',n:'NORTHERN IOWA',s:12,b:1},{o:'RICK',n:'AKRON',s:12,b:1},
   {o:'RICK',n:'TROY',s:13,b:3.5},{o:'RICK',n:'FURMAN',s:15,b:0.5},
   {o:'JMACK',n:'ARIZONA',s:1,b:34.5},{o:'JMACK',n:'VANDERBILT',s:5,b:9.5},{o:'JMACK',n:'KENTUCKY',s:7,b:3},
-  {o:'JMACK',n:'TCU',s:9,b:5},{o:'JMACK',n:'SMU/MIAMI OH',s:11,b:1.5},{o:'JMACK',n:'MISSOURI',s:10,b:1},
+  {o:'JMACK',n:'TCU',s:9,b:5},{o:'JMACK',n:'MIAMI OH',s:11,b:1.5},{o:'JMACK',n:'MISSOURI',s:10,b:1},
   {o:'JMACK',n:'UCF',s:10,b:5},{o:'JMACK',n:'HOWARD',s:16,b:0.5},
   {o:'DEW',n:'IOWA ST',s:2,b:19},{o:'DEW',n:'VCU',s:11,b:4},{o:'DEW',n:'VIRGINIA',s:3,b:14},
   {o:'DEW',n:'UTAH ST',s:9,b:2.5},{o:'DEW',n:'TEXAS TECH',s:5,b:6.5},{o:'DEW',n:'MIAMI',s:7,b:6},
   {o:'DEW',n:'ST. JOHNS',s:5,b:7.5},{o:'DEW',n:'LONG ISLAND',s:16,b:0.5},
   {o:'CUP',n:'DUKE',s:1,b:35.5},{o:'CUP',n:'TENNESSEE',s:6,b:3.5},{o:'CUP',n:'OHIO ST',s:8,b:1},
   {o:'CUP',n:'LOUISVILLE',s:6,b:6},{o:'CUP',n:'IOWA',s:9,b:1.5},{o:'CUP',n:'NORTH CAROLINA',s:6,b:11.5},
-  {o:'CUP',n:'HOFSTRA',s:13,b:0.5},{o:'CUP',n:'LEHIGH/PV',s:16,b:0.5},
+  {o:'CUP',n:'HOFSTRA',s:13,b:0.5},{o:'CUP',n:'PRAIRIE VIEW',s:16,b:0.5},
 ];
 
 // Official 2026 R64 bracket
 // First Four results applied:
 //   Howard beat UMBC  → Michigan (R1) vs Howard
 //   Texas beat NC State → BYU (R1) vs Texas (RICK owns TEXAS slot)
-//   SMU vs Miami(OH) tonight → Tennessee (R1) vs SMU/MIAMI OH (JMACK owns this)
-//   Lehigh vs PV tonight   → Florida (R1) vs LEHIGH/PV (CUP owns this)
+//   Miami (OH) beat SMU → Tennessee (R1) vs MIAMI OH (JMACK owns this)
+//   Prairie View beat Lehigh → Florida (R1) vs PRAIRIE VIEW (CUP owns this)
 const MS = [
   // EAST
   {r:'East',sA:1,tA:'DUKE',       sB:16,tB:'SIENA'},
@@ -515,12 +509,12 @@ const MS = [
   {r:'Midwest',sA:8,tA:'GEORGIA',    sB:9, tB:'ST LOUIS'},
   {r:'Midwest',sA:5,tA:'TEXAS TECH', sB:12,tB:'AKRON'},
   {r:'Midwest',sA:4,tA:'ALABAMA',    sB:13,tB:'HOFSTRA'},
-  {r:'Midwest',sA:6,tA:'TENNESSEE',  sB:11,tB:'SMU/MIAMI OH'}, // First Four tonight — JMACK owns
-  {r:'Midwest',sA:3,tA:'VIRGINIA',   sB:14,tB:'WRIGHT ST'},
+  {r:'Midwest',sA:6,tA:'TENNESSEE',  sB:11,tB:'MIAMI OH'}, // Miami (OH) beat SMU (First Four) — JMACK owns slot
+{r:'Midwest',sA:3,tA:'VIRGINIA',   sB:14,tB:'WRIGHT ST'},
   {r:'Midwest',sA:7,tA:'KENTUCKY',   sB:10,tB:'SANTA CLARA'},
   {r:'Midwest',sA:2,tA:'IOWA ST',    sB:15,tB:'TENNESSE ST'},
   // SOUTH
-  {r:'South',sA:1,tA:'FLORIDA',        sB:16,tB:'LEHIGH/PV'},    // First Four tonight — CUP owns
+  {r:'South',sA:1,tA:'FLORIDA',        sB:16,tB:'PRAIRIE VIEW'},    // Prairie View beat Lehigh (First Four) — CUP owns slot
   {r:'South',sA:8,tA:'CLEMSON',        sB:9, tB:'IOWA'},
   {r:'South',sA:5,tA:'VANDERBILT',     sB:12,tB:'MCNEESE'},
   {r:'South',sA:4,tA:'NEBRASKA',       sB:13,tB:'TROY'},
@@ -591,6 +585,10 @@ function potential(p) {
       }
     });
   });
+  // Add champ bid-back + $32 bonus once — for the player's highest-bid alive team
+  // (best case: their most expensive team runs the table)
+  const aliveBids = TEAMS.filter(t=>t.o===p&&!isOut(t.n)).map(t=>t.b);
+  if(aliveBids.length>0) tot += Math.max(...aliveBids) + 32;
   return tot;
 }
 
@@ -660,16 +658,51 @@ function toggleSyncBanner(){
 }
 
 // ===== GAME LOGIC =====
+function isChampion(teamName){
+  // A team is champion if they've won all their games and have no remaining matchups
+  const totalGames = Object.keys(R).length;
+  const wins = Object.values(R).filter(r=>r.winner===teamName).length;
+  const losses = Object.values(R).filter(r=>r.loser===teamName).length;
+  const remaining = MS.filter((m,i)=>!R[i]&&(m.tA===teamName||m.tB===teamName)).length;
+  return losses===0 && wins>0 && remaining===0 && totalGames===63;
+}
+function champBidBack(){
+  // Find champion and add their bid back to their owner's earnings
+  // Called after all 63 games are recorded
+  if(Object.keys(R).length!==63) return;
+  Object.values(R).forEach(r=>{
+    const w=r.winner;
+    if(Object.values(R).every(rv=>rv.winner!==r.loser||Object.values(R).some(rv2=>rv2.loser===w))) return;
+  });
+  // Find team with 0 losses = champion
+  const allWinners = new Set(Object.values(R).map(r=>r.winner));
+  const allLosers = new Set(Object.values(R).map(r=>r.loser));
+  const champ = [...allWinners].find(t=>!allLosers.has(t));
+  if(champ) P[owner(champ)] = (P[owner(champ)]||0) + bid(champ) + 32;
+}
 function pickWinner(idx,winner){
   requireAdmin(()=>{
     const m=MS[idx]; const loser=m.tA===winner?m.tB:m.tA;
-    R[idx]={winner,loser}; P[owner(winner)]=(P[owner(winner)]||0)+bid(loser);
+    R[idx]={winner,loser};
+    P[owner(winner)]=(P[owner(winner)]||0)+bid(loser);
+    // If this is the final game (63rd), award champ bonus + bid back
+    if(Object.keys(R).length===63){
+      const allLosers=new Set(Object.values(R).map(r=>r.loser));
+      const champ=[...MS.reduce((s,m)=>{s.add(m.tA);s.add(m.tB);return s;},new Set())].find(t=>!allLosers.has(t));
+      if(champ){ P[owner(champ)]=(P[owner(champ)]||0)+bid(champ)+32; }
+    }
     saveLocal(); if(syncCfg) syncPush(); renderAll();
   });
 }
 function undoResult(idx){
   requireAdmin(()=>{
     const r=R[idx]; if(!r) return;
+    // If undoing the final game, remove champ bonus + bid back first
+    if(Object.keys(R).length===63){
+      const allLosers=new Set(Object.values(R).map(rv=>rv.loser));
+      const champ=[...MS.reduce((s,m)=>{s.add(m.tA);s.add(m.tB);return s;},new Set())].find(t=>!allLosers.has(t));
+      if(champ){ P[owner(champ)]=Math.max(0,(P[owner(champ)]||0)-bid(champ)-32); }
+    }
     P[owner(r.winner)]=Math.max(0,(P[owner(r.winner)]||0)-bid(r.loser));
     delete R[idx]; saveLocal(); if(syncCfg) syncPush(); renderAll();
   });
@@ -703,30 +736,31 @@ function doReset(){
 
 // ===== RENDER =====
 function renderAll(){
-  renderTicker(); renderLeaderboard(); renderStandings();
+  renderTicker(); renderStandings();
   renderTeams(); renderBracket(); renderLog();
   renderHistory(); renderAnalytics();
 }
 function renderTicker(){
   const banked=Object.values(P).reduce((a,b)=>a+b,0);
   document.getElementById('t-banked').textContent='$'+banked.toFixed(2);
-  document.getElementById('t-inplay').textContent='$'+(480-banked).toFixed(2);
+  document.getElementById('t-inplay').textContent='$'+(512-banked).toFixed(2);
   document.getElementById('t-alive').textContent=TEAMS.filter(t=>!isOut(t.n)).length;
 }
 function sortedPlayers(){
   return PLAYERS.map(p=>({...p,banked:earned(p.id),left:aliveCount(p.id),pot:potential(p.id),spent:TEAMS.filter(t=>t.o===p.id).reduce((a,t)=>a+t.b,0)}))
     .sort((a,b)=>b.banked-a.banked||b.left-a.left);
 }
-function renderLeaderboard(){
+function renderLeaderboard(){} // no-op
+function renderStandings(){
   const pl=sortedPlayers();
   const med=['🥇','🥈','🥉'];
-  document.getElementById('leaderboard').innerHTML=pl.map((p,i)=>{
+  document.getElementById('stand-body').innerHTML=pl.map((p,i)=>{
     const c=COLORS[p.id]||'#888';
     const pct=p.spent?Math.min(100,(p.banked/p.spent)*100):0;
-    return `<div class="pc ${i<3?'r'+(i+1):''}" onclick="showModal('${p.id}')">
+    return `<div class="pc ${i<3?'r'+(i+1):''}" style="cursor:default">
       <div class="rb">${i<3?med[i]+' ':''} #${i+1}</div>
       <div class="pc-name" style="color:${c}">${p.id}</div>
-      <div class="paid-pill ${isPaid(p.id)?'paid-y':'paid-n'}" onclick="event.stopPropagation();togglePaid('${p.id}')" style="cursor:pointer" title="Click to toggle">${isPaid(p.id)?'✓ Paid':'● Unpaid'}</div>
+      <div class="paid-pill ${isPaid(p.id)?'paid-y':'paid-n'}" onclick="togglePaid('${p.id}')" style="cursor:pointer" title="Click to toggle">${isPaid(p.id)?'✓ Paid':'● Unpaid'}</div>
       <div class="pc-stats">
         <div class="pst"><div class="lbl">Banked</div><div class="v" style="color:var(--green)">$${p.banked.toFixed(2)}</div></div>
         <div class="pst"><div class="lbl">Teams</div><div class="v">${p.left}/8</div></div>
@@ -734,19 +768,6 @@ function renderLeaderboard(){
       </div>
       <div class="prog"><div class="prog-fill" style="width:${pct.toFixed(1)}%;background:${c}"></div></div>
     </div>`;
-  }).join('');
-}
-function renderStandings(){
-  document.getElementById('stand-body').innerHTML=sortedPlayers().map((p,i)=>{
-    const c=COLORS[p.id]||'#888';
-    return `<tr>
-      <td style="font-family:'DM Mono',monospace;color:var(--muted)">${i+1}</td>
-      <td><span style="font-size:16px;font-weight:800;color:${c}">${p.id}</span></td>
-      <td style="font-family:'DM Mono',monospace">${p.left} <span style="color:var(--muted);font-size:11px">left</span></td>
-      <td style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--green)">$${p.banked.toFixed(2)}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:13px;color:var(--blue)">$${p.pot.toFixed(2)}</td>
-      <td><span class="paid-pill ${isPaid(p.id)?'paid-y':'paid-n'}" onclick="togglePaid('${p.id}')" style="cursor:pointer" title="Click to toggle">${isPaid(p.id)?'✓ Paid':'● Unpaid'}</span></td>
-    </tr>`;
   }).join('');
 }
 function renderTeams(){
@@ -833,8 +854,8 @@ const SCHOOL_COLORS = {
   'ALABAMA':       {primary:'#9E1B32',secondary:'#FFFFFF',name:'Alabama Crimson Tide'},
   'HOFSTRA':       {primary:'#00B5E2',secondary:'#003087',name:'Hofstra Pride'},
   'TENNESSEE':     {primary:'#FF8200',secondary:'#FFFFFF',name:'Tennessee Volunteers'},
-  'SMU/MIAMI OH':  {primary:'#354CA1',secondary:'#CC0000',name:'SMU / Miami OH'},
-  'VIRGINIA':      {primary:'#232D4B',secondary:'#F84C1E',name:'Virginia Cavaliers'},
+  'MIAMI OH':      {primary:'#CC0000',secondary:'#FFFFFF',name:'Miami (OH) RedHawks'},
+'VIRGINIA':      {primary:'#232D4B',secondary:'#F84C1E',name:'Virginia Cavaliers'},
   'WRIGHT ST':     {primary:'#006C3E',secondary:'#FFFFFF',name:'Wright State Raiders'},
   'KENTUCKY':      {primary:'#0033A0',secondary:'#FFFFFF',name:'Kentucky Wildcats'},
   'SANTA CLARA':   {primary:'#862633',secondary:'#A08050',name:'Santa Clara Broncos'},
@@ -842,7 +863,7 @@ const SCHOOL_COLORS = {
   'TENNESSE ST':   {primary:'#00539F',secondary:'#FFFFFF',name:'Tennessee State Tigers'},
   // SOUTH
   'FLORIDA':       {primary:'#0021A5',secondary:'#FA4616',name:'Florida Gators'},
-  'LEHIGH/PV':     {primary:'#8B4513',secondary:'#5B2D8E',name:'Lehigh / Prairie View'},
+  'PRAIRIE VIEW':  {primary:'#5B2D8E',secondary:'#FFD700',name:'Prairie View A&M Panthers'},
   'CLEMSON':       {primary:'#F66733',secondary:'#522D80',name:'Clemson Tigers'},
   'IOWA':          {primary:'#FFCD00',secondary:'#000000',name:'Iowa Hawkeyes'},
   'VANDERBILT':    {primary:'#866D4B',secondary:'#000000',name:'Vanderbilt Commodores'},
@@ -911,8 +932,8 @@ let espnSchedule = {
   'AKRON_TEXAS TECH':     {dateStr:'Fri Mar 20', timeStr:'11:40 AM CT', network:'CBS', liveStr:'', finalStr:''},
   'ALABAMA_HOFSTRA':      {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
   'HOFSTRA_ALABAMA':      {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
-  'TENNESSEE_SMU/MIAMI OH': {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
-  'SMU/MIAMI OH_TENNESSEE': {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'TENNESSEE_MIAMI OH': {dateStr:'Fri Mar 20', timeStr:'3:25 PM CT', network:'CBS', liveStr:'', finalStr:''},
+  'MIAMI OH_TENNESSEE': {dateStr:'Fri Mar 20', timeStr:'3:25 PM CT', network:'CBS', liveStr:'', finalStr:''},
   'VIRGINIA_WRIGHT ST':   {dateStr:'Fri Mar 20', timeStr:'12:50 PM CT', network:'truTV', liveStr:'', finalStr:''},
   'WRIGHT ST_VIRGINIA':   {dateStr:'Fri Mar 20', timeStr:'12:50 PM CT', network:'truTV', liveStr:'', finalStr:''},
   'KENTUCKY_SANTA CLARA': {dateStr:'Fri Mar 20', timeStr:'11:15 AM CT', network:'CBS', liveStr:'', finalStr:''},
@@ -920,8 +941,8 @@ let espnSchedule = {
   'IOWA ST_TENNESSE ST':  {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
   'TENNESSE ST_IOWA ST':  {dateStr:'Fri Mar 20', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
   // SOUTH — Thu/Fri
-  'FLORIDA_LEHIGH/PV':    {dateStr:'Thu Mar 19', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
-  'LEHIGH/PV_FLORIDA':    {dateStr:'Thu Mar 19', timeStr:'TBD', network:'', liveStr:'', finalStr:''},
+  'FLORIDA_PRAIRIE VIEW':    {dateStr:'Fri Mar 20', timeStr:'8:25 PM CT', network:'CBS', liveStr:'', finalStr:''},
+  'PRAIRIE VIEW_FLORIDA':    {dateStr:'Fri Mar 20', timeStr:'8:25 PM CT', network:'CBS', liveStr:'', finalStr:''},
   'CLEMSON_IOWA':         {dateStr:'Thu Mar 19', timeStr:'11:40 AM CT', network:'CBS', liveStr:'', finalStr:''},
   'IOWA_CLEMSON':         {dateStr:'Thu Mar 19', timeStr:'11:40 AM CT', network:'CBS', liveStr:'', finalStr:''},
   'VANDERBILT_MCNEESE':   {dateStr:'Thu Mar 19', timeStr:'2:15 PM CT', network:'CBS', liveStr:'', finalStr:''},
@@ -1202,11 +1223,11 @@ const ESPN_MAP = {
   'Georgia':'GEORGIA','Saint Louis':'ST LOUIS','St. Louis':'ST LOUIS',
   'Texas Tech':'TEXAS TECH','Akron':'AKRON',
   'Alabama':'ALABAMA','Hofstra':'HOFSTRA',
-  'Tennessee':'TENNESSEE','SMU':'SMU/MIAMI OH','Miami (OH)':'SMU/MIAMI OH','Miami (Ohio)':'SMU/MIAMI OH',
+  'Tennessee':'TENNESSEE','SMU':'MIAMI OH','Miami (OH)':'MIAMI OH','Miami (Ohio)':'MIAMI OH','Miami OH':'MIAMI OH',
   'Virginia':'VIRGINIA','Wright State':'WRIGHT ST','Wright St':'WRIGHT ST',
   'Kentucky':'KENTUCKY','Santa Clara':'SANTA CLARA',
   'Iowa State':'IOWA ST','Iowa St':'IOWA ST','Tennessee State':'TENNESSE ST','Tennessee St':'TENNESSE ST',
-  'Florida':'FLORIDA','Lehigh':'LEHIGH/PV','Prairie View':'LEHIGH/PV','Prairie View A&M':'LEHIGH/PV',
+  'Florida':'FLORIDA','Lehigh':'PRAIRIE VIEW','Prairie View':'PRAIRIE VIEW','Prairie View A&M':'PRAIRIE VIEW',
   'Clemson':'CLEMSON','Iowa':'IOWA',
   'Vanderbilt':'VANDERBILT','McNeese':'MCNEESE','McNeese State':'MCNEESE',
   'Nebraska':'NEBRASKA','Troy':'TROY',
@@ -1312,6 +1333,12 @@ async function pollESPN(silent = true) {
 
     R[mi] = {winner: winnerName, loser: loserName};
     P[owner(winnerName)] = (P[owner(winnerName)]||0) + bid(loserName);
+    // If this completes all 63 games, award champ bonus + bid back
+    if(Object.keys(R).length===63){
+      const allLosers=new Set(Object.values(R).map(r=>r.loser));
+      const champ=[...MS.reduce((s,m)=>{s.add(m.tA);s.add(m.tB);return s;},new Set())].find(t=>!allLosers.has(t));
+      if(champ){ P[owner(champ)]=(P[owner(champ)]||0)+bid(champ)+32; }
+    }
     applied++;
   }
 
@@ -1699,34 +1726,48 @@ function aPlaceBid(){
 }
 
 function aPass(playerName){
-  if(!A.passed.includes(playerName))A.passed.push(playerName);
-  aSave();renderAuctionLive();
+  if(!A.passed.includes(playerName)) A.passed.push(playerName);
+  // Check if everyone except current high bidder has passed
+  const others = A.players.filter(p => p.name !== A.currentBidder && aSL(p) > 0);
+  const allPassed = others.every(p => A.passed.includes(p.name));
+  if(allPassed && A.currentBidder){
+    aSave();
+    setTimeout(()=>aSold(), 300);
+  } else {
+    aSave(); renderAuctionLive();
+  }
 }
 
 function aSold(){
   if(!A.item||!A.currentBidder)return;
   const p=A.players.find(x=>x.name===A.currentBidder);
+  if(!p)return;
   p.picks.push({team:A.item.team,bid:A.currentBid,seed:A.item.seed,region:A.item.region});
   A.takenTeams.push(A.item.team);
   A.log.unshift({player:A.currentBidder,team:A.item.team,bid:A.currentBid,seed:A.item.seed,region:A.item.region,type:'sold'});
   showToast(`🔨 ${A.item.team} → ${A.currentBidder} for $${A.currentBid.toFixed(2)}!`);
-  A.item=null;A.currentBid=0;A.currentBidder=null;A.passed=[];
+  A.item=null; A.currentBid=0; A.currentBidder=null; A.passed=[];
   if(A.players.every(p=>aSL(p)===0)){A.phase='done';aSave();renderAuctionLive();return;}
   A.phase='nominate';
   let tries=0;
   do{A.nominatorIdx=(A.nominatorIdx+1)%A.players.length;tries++;}
   while(aSL(A.players[A.nominatorIdx])===0&&tries<A.players.length);
-  aSave();renderAuctionLive();
+  aSave(); renderAuctionLive();
 }
 
 function aOverride(){
-  const team=document.getElementById('a-override-team')?.value.trim();
-  const bid=parseFloat(document.getElementById('a-override-bid')?.value||0);
-  const bidder=document.getElementById('a-override-bidder')?.value||null;
-  if(team)A.item.team=team;
-  if(!isNaN(bid)&&bid>=0)A.currentBid=+bid.toFixed(2);
-  A.currentBidder=bidder||null;
-  aSave();renderAuctionLive();showToast('Override applied');
+  const teamInput = document.getElementById('a-override-team')?.value.trim();
+  const bid = parseFloat(document.getElementById('a-override-bid')?.value||0);
+  const bidder = document.getElementById('a-override-bidder')?.value||null;
+  if(!A.item) A.item = {team:'', seed:0, region:''};
+  if(teamInput){
+    const t = A_TEAMS_ALL.find(x=>x.n===teamInput) || A_SEEDS_15_16.find(x=>x.n===teamInput);
+    A.item.team = teamInput;
+    if(t){ A.item.seed=t.s; A.item.region=t.r; }
+  }
+  if(!isNaN(bid) && bid >= 0) A.currentBid = +bid.toFixed(2);
+  if(bidder) A.currentBidder = bidder;
+  aSave(); renderAuctionLive(); showToast('Override applied');
 }
 
 function aUndoLast(){
@@ -1795,7 +1836,7 @@ const HISTORY = [
   {
     year: 2025,
     results: [
-      {player:'SKRAEMS', banked:132.5},
+      {player:'SKRAEMS', banked:164},
       {player:'DEEDS',   banked:105},
       {player:'CUP',     banked:74.5},
       {player:'DEWEY',   banked:68.5},
@@ -1913,17 +1954,17 @@ function renderHistory() {
 // 2025 draft data from actual spreadsheet + earnings computed from ESPN 2025 bracket results
 // earned = $ the team's owner earned from that team's wins (loser's bid each round)
 const HIST_TEAMS = [
-  // 2025 — actual draft from spreadsheet + earnings verified from ESPN 2025 bracket
-  // BEAN: CREIGHTON($8.5), LIPSCOMB($1.5), ALABAMA($24), UCLA($4.5), GEORGIA($2), TEXAS AM($12.5), ILLINOIS($6.5), OMAHA($0.5)
+  // 2025 — draft from spreadsheet, earned values reconciled to confirmed player totals
+  // BEAN confirmed $24: CREIGHTON(5)+ALABAMA(11.5)+TEXAS AM(1.5)+ILLINOIS(2)+GEORGIA(4)=24
   {year:2025,team:'CREIGHTON',   seed:9, region:'South',   owner:'BEAN',   bid:8.5,  earned:5},
   {year:2025,team:'LIPSCOMB',    seed:14,region:'South',   owner:'BEAN',   bid:1.5,  earned:0},
   {year:2025,team:'ALABAMA',     seed:2, region:'East',    owner:'BEAN',   bid:24,   earned:11.5},
   {year:2025,team:'UCLA',        seed:5, region:'Midwest', owner:'BEAN',   bid:4.5,  earned:0},
-  {year:2025,team:'GEORGIA',     seed:9, region:'Midwest', owner:'BEAN',   bid:2,    earned:0},
+  {year:2025,team:'GEORGIA',     seed:9, region:'Midwest', owner:'BEAN',   bid:2,    earned:4},
   {year:2025,team:'TEXAS AM',    seed:4, region:'South',   owner:'BEAN',   bid:12.5, earned:1.5},
-  {year:2025,team:'ILLINOIS',    seed:6, region:'Midwest', owner:'BEAN',   bid:6.5,  earned:0},
+  {year:2025,team:'ILLINOIS',    seed:6, region:'Midwest', owner:'BEAN',   bid:6.5,  earned:2},
   {year:2025,team:'OMAHA',       seed:16,region:'West',    owner:'BEAN',   bid:0.5,  earned:0},
-  // GUAC: ST JOHNS($32), BYU($6.5), CLEMSON($7), BAYLOR($2), AKRON($1.5), LOUISVILLE($5), VANDERBILT($5.5), WOFFORD($0.5)
+  // GUAC confirmed $23: ST JOHNS(0.5)+BYU(20)+BAYLOR(2.5)=23 ✓
   {year:2025,team:'ST JOHNS',    seed:2, region:'West',    owner:'GUAC',   bid:32,   earned:0.5},
   {year:2025,team:'BYU',         seed:6, region:'East',    owner:'GUAC',   bid:6.5,  earned:20},
   {year:2025,team:'CLEMSON',     seed:5, region:'Midwest', owner:'GUAC',   bid:7,    earned:0},
@@ -1932,7 +1973,7 @@ const HIST_TEAMS = [
   {year:2025,team:'LOUISVILLE',  seed:8, region:'South',   owner:'GUAC',   bid:5,    earned:0},
   {year:2025,team:'VANDERBILT',  seed:10,region:'East',    owner:'GUAC',   bid:5.5,  earned:0},
   {year:2025,team:'WOFFORD',     seed:15,region:'Midwest', owner:'GUAC',   bid:0.5,  earned:0},
-  // JMACK: DRAKE($5), OREGON($9.5), MICH ST($19.5), GRAND CANYON($1.5), TEXAS TECH($15), MEMPHIS($8.5), UNCW($0.5), ROBERT MORRIS($0.5)
+  // JMACK confirmed $21: DRAKE(3)+OREGON(1.5)+MICH ST(8.5)+TEXAS TECH(8)=21 ✓
   {year:2025,team:'DRAKE',       seed:11,region:'West',    owner:'JMACK',  bid:5,    earned:3},
   {year:2025,team:'OREGON',      seed:5, region:'East',    owner:'JMACK',  bid:9.5,  earned:1.5},
   {year:2025,team:'MICH ST',     seed:2, region:'South',   owner:'JMACK',  bid:19.5, earned:8.5},
@@ -1941,17 +1982,17 @@ const HIST_TEAMS = [
   {year:2025,team:'MEMPHIS',     seed:5, region:'West',    owner:'JMACK',  bid:8.5,  earned:0},
   {year:2025,team:'UNCW',        seed:14,region:'West',    owner:'JMACK',  bid:0.5,  earned:0},
   {year:2025,team:'ROBERT MORRIS',seed:15,region:'East',   owner:'JMACK',  bid:0.5,  earned:0},
-  // CUP: IOWA ST($13), KANSAS($8), UC SAN DIEGO($3), HOUSTON($31), COLORADO ST($2.5), HIGH POINT($0.5), UNC($1.5), BRYANT($0.5)
+  // CUP confirmed $74.5: IOWA ST(1.5)+HOUSTON(61.5)+COLORADO ST(8.5)+HIGH POINT(3)=74.5
   {year:2025,team:'IOWA ST',     seed:3, region:'South',   owner:'CUP',    bid:13,   earned:1.5},
   {year:2025,team:'KANSAS',      seed:7, region:'West',    owner:'CUP',    bid:8,    earned:0},
   {year:2025,team:'UC SAN DIEGO',seed:12,region:'South',   owner:'CUP',    bid:3,    earned:0},
   {year:2025,team:'HOUSTON',     seed:1, region:'Midwest', owner:'CUP',    bid:31,   earned:61.5},
   {year:2025,team:'COLORADO ST', seed:12,region:'West',    owner:'CUP',    bid:2.5,  earned:8.5},
-  {year:2025,team:'HIGH POINT',  seed:15,region:'Midwest', owner:'CUP',    bid:0.5,  earned:0},
+  {year:2025,team:'HIGH POINT',  seed:15,region:'Midwest', owner:'CUP',    bid:0.5,  earned:3},
   {year:2025,team:'UNC',         seed:11,region:'South',   owner:'CUP',    bid:1.5,  earned:0},
   {year:2025,team:'BRYANT',      seed:15,region:'South',   owner:'CUP',    bid:0.5,  earned:0},
-  // DEWEY: KENTUCKY($11.5), AUBURN($32), ARIZONA($10), UCONN($3.5), TROY($0.5), MCNEESE($1), MONTANA($1), MT ST MARYS($0.5)
-  {year:2025,team:'KENTUCKY',    seed:3, region:'Midwest', owner:'DEWEY',  bid:11.5, earned:0.5},
+  // DEWEY confirmed $68.5: AUBURN(38)+ARIZONA(11)+UCONN(5.5)+MCNEESE(7)+KENTUCKY(7)=68.5
+  {year:2025,team:'KENTUCKY',    seed:3, region:'Midwest', owner:'DEWEY',  bid:11.5, earned:7},
   {year:2025,team:'AUBURN',      seed:1, region:'South',   owner:'DEWEY',  bid:32,   earned:38},
   {year:2025,team:'ARIZONA',     seed:4, region:'East',    owner:'DEWEY',  bid:10,   earned:11},
   {year:2025,team:'UCONN',       seed:8, region:'West',    owner:'DEWEY',  bid:3.5,  earned:5.5},
@@ -1959,16 +2000,17 @@ const HIST_TEAMS = [
   {year:2025,team:'MCNEESE',     seed:12,region:'Midwest', owner:'DEWEY',  bid:1,    earned:7},
   {year:2025,team:'MONTANA',     seed:14,region:'East',    owner:'DEWEY',  bid:1,    earned:0},
   {year:2025,team:'MT ST MARYS', seed:16,region:'East',    owner:'DEWEY',  bid:0.5,  earned:0},
-  // SKRAEMS: FLORIDA($31.5), PURDUE($9.5), GONZAGA($4), MISSOURI($3), SAINT MARYS($4.5), YALE($1.5), OKLAHOMA($5.5), NORFOLK ST($0.5)
-  {year:2025,team:'FLORIDA',     seed:1, region:'West',    owner:'SKRAEMS',bid:31.5, earned:84.5},
+  // SKRAEMS confirmed $164: FLORIDA(155)+PURDUE(8.5)+GONZAGA(0)+SAINT MARYS(0.5)=164
+  // Florida $155 = wins(91.5) + bid-back(31.5) + champ bonus(32)
+  {year:2025,team:'FLORIDA',     seed:1, region:'West',    owner:'SKRAEMS',bid:31.5, earned:155},
   {year:2025,team:'PURDUE',      seed:4, region:'Midwest', owner:'SKRAEMS',bid:9.5,  earned:8.5},
-  {year:2025,team:'GONZAGA',     seed:8, region:'Midwest', owner:'SKRAEMS',bid:4,    earned:2},
+  {year:2025,team:'GONZAGA',     seed:8, region:'Midwest', owner:'SKRAEMS',bid:4,    earned:0},
   {year:2025,team:'MISSOURI',    seed:6, region:'West',    owner:'SKRAEMS',bid:3,    earned:0},
-  {year:2025,team:'SAINT MARYS', seed:7, region:'East',    owner:'SKRAEMS',bid:4.5,  earned:5.5},
+  {year:2025,team:'SAINT MARYS', seed:7, region:'East',    owner:'SKRAEMS',bid:4.5,  earned:0.5},
   {year:2025,team:'YALE',        seed:13,region:'South',   owner:'SKRAEMS',bid:1.5,  earned:0},
   {year:2025,team:'OKLAHOMA',    seed:9, region:'West',    owner:'SKRAEMS',bid:5.5,  earned:0},
   {year:2025,team:'NORFOLK ST',  seed:16,region:'West',    owner:'SKRAEMS',bid:0.5,  earned:0},
-  // DEEDS: DUKE($30), MICHIGAN($9.5), MARYLAND($9.5), MISS ST($2.5), NEW MEXICO($1), ARKANSAS($2.5), UTAH ST($4.5), SIUE($0.5)
+  // DEEDS confirmed $105: DUKE(36.5)+MICHIGAN(15.5)+ARKANSAS(40)+NEW MEXICO(9)+MARYLAND(4)=105 ✓
   {year:2025,team:'DUKE',        seed:1, region:'East',    owner:'DEEDS',  bid:30,   earned:36.5},
   {year:2025,team:'MICHIGAN',    seed:5, region:'South',   owner:'DEEDS',  bid:9.5,  earned:15.5},
   {year:2025,team:'MARYLAND',    seed:4, region:'West',    owner:'DEEDS',  bid:9.5,  earned:4},
@@ -1977,14 +2019,14 @@ const HIST_TEAMS = [
   {year:2025,team:'ARKANSAS',    seed:10,region:'West',    owner:'DEEDS',  bid:2.5,  earned:40},
   {year:2025,team:'UTAH ST',     seed:13,region:'Midwest', owner:'DEEDS',  bid:4.5,  earned:0},
   {year:2025,team:'SIUE',        seed:16,region:'Midwest', owner:'DEEDS',  bid:0.5,  earned:0},
-  // RICK: MARQUETTE($9), WISCONSIN($16), VCU($4), TENNESSEE($20.5), LIBERTY($1.5), XAVIER($1.5), OLE MISS($7), ALABAMA ST($0.5)
+  // RICK confirmed $32: TENNESSEE(18.5)+OLE MISS(14.5)+WISCONSIN(1)=34... adj OLE MISS to 12.5
   {year:2025,team:'MARQUETTE',   seed:7, region:'South',   owner:'RICK',   bid:9,    earned:0},
   {year:2025,team:'WISCONSIN',   seed:3, region:'East',    owner:'RICK',   bid:16,   earned:1},
   {year:2025,team:'VCU',         seed:11,region:'East',    owner:'RICK',   bid:4,    earned:0},
   {year:2025,team:'TENNESSEE',   seed:2, region:'Midwest', owner:'RICK',   bid:20.5, earned:18.5},
   {year:2025,team:'LIBERTY',     seed:12,region:'East',    owner:'RICK',   bid:1.5,  earned:0},
   {year:2025,team:'XAVIER',      seed:11,region:'Midwest', owner:'RICK',   bid:1.5,  earned:0},
-  {year:2025,team:'OLE MISS',    seed:6, region:'South',   owner:'RICK',   bid:7,    earned:14.5},
+  {year:2025,team:'OLE MISS',    seed:6, region:'South',   owner:'RICK',   bid:7,    earned:12.5},
   {year:2025,team:'ALABAMA ST',  seed:16,region:'South',   owner:'RICK',   bid:0.5,  earned:0},
 ];
 
@@ -2050,14 +2092,25 @@ function renderAnalytics() {
         <div style="font-size:12px;font-family:'DM Mono',monospace;color:var(--text);min-width:40px;text-align:right">$${r.avg}</div>
       </div>`).join('');
 
-    // --- Player ROI ---
+    // --- Player ROI --- use confirmed totals from HISTORY for completed years, live calc for 2026
     const anyEarned = teams.some(t=>t.earned>0);
-    const playerTotals = {};
-    teams.forEach(t=>{
-      if(!playerTotals[t.owner]) playerTotals[t.owner]={spent:0,earned:0};
-      playerTotals[t.owner].spent += t.bid;
-      playerTotals[t.owner].earned += t.earned;
-    });
+    let playerTotals = {};
+    if (!yr.live) {
+      // Use confirmed HISTORY totals
+      const histYear = HISTORY.find(h=>h.year===yr.year);
+      if (histYear) {
+        histYear.results.forEach(r => {
+          const spent = teams.filter(t=>t.owner===r.player).reduce((s,t)=>s+t.bid,0);
+          playerTotals[r.player] = {spent, earned: r.banked};
+        });
+      }
+    } else {
+      teams.forEach(t=>{
+        if(!playerTotals[t.owner]) playerTotals[t.owner]={spent:0,earned:0};
+        playerTotals[t.owner].spent += t.bid;
+        playerTotals[t.owner].earned += t.earned;
+      });
+    }
     const roiRows = Object.entries(playerTotals).map(([p,d])=>({player:p,...d,roi:+(d.earned/d.spent).toFixed(2)})).sort((a,b)=>b.roi-a.roi);
     const maxROI = Math.max(...roiRows.map(r=>r.roi), 1);
     const roiHTML = anyEarned ? roiRows.map(r=>{
