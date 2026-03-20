@@ -558,11 +558,11 @@ function renderAdminStatus() {
 
 function rebuildP() {
   P = {};
-  // Replay every result in bracket order to recompute P from scratch
-  Object.entries(R).forEach(([idx, r]) => {
-    P[owner(r.winner)] = (P[owner(r.winner)]||0) + bid(r.loser);
+  Object.values(R).forEach(r => {
+    const e = r.earned !== undefined ? r.earned : bid(r.loser); // use stored, fall back to lookup for old records
+    P[owner(r.winner)] = (P[owner(r.winner)]||0) + e;
   });
-  // If tournament is complete (63 results), add champ bonus + bid back
+  // If tournament complete, add champ bonus + bid back
   if(Object.keys(R).length === 63) {
     const allLosers = new Set(Object.values(R).map(r=>r.loser));
     const champ = [...MS.reduce((s,m)=>{s.add(m.tA);s.add(m.tB);return s;},new Set())].find(t=>!allLosers.has(t));
@@ -571,8 +571,10 @@ function rebuildP() {
 }
 
 function loadLocal() {
-  try { const s=JSON.parse(localStorage.getItem('ts26v3')||'{}'); R=s.R||{}; P=s.P||{}; PAID=s.PAID||{}; } catch(e){}
-  rebuildP(); // always recompute P from R to prevent corruption
+  try { const s=JSON.parse(localStorage.getItem('ts26v3')||'{}'); R=s.R||{}; PAID=s.PAID||{}; } catch(e){}
+  // Migrate old R entries that don't have earned stored
+  Object.values(R).forEach(r => { if(r.earned===undefined) r.earned=bid(r.loser)||0; });
+  rebuildP();
 }
 function saveLocal() { localStorage.setItem('ts26v3', JSON.stringify({R,PAID})); }
 function isPaid(p) { return p in PAID ? PAID[p] : PLAYERS.find(x=>x.id===p).paid; }
@@ -621,7 +623,10 @@ async function syncPull() {
     const data = await res.json();
     const remote = data.record||{};
     const h = JSON.stringify(remote);
-    if(h!==lastHash){ lastHash=h; R=remote.R||{}; P=remote.P||{}; PAID=remote.PAID||{}; rebuildP(); saveLocal(); renderAll(); setSyncStatus('live','Live — synced'); }
+    if(h!==lastHash){ lastHash=h; R=remote.R||{}; PAID=remote.PAID||{};
+      // Migrate old entries missing earned
+      Object.values(R).forEach(r => { if(r.earned===undefined) r.earned=bid(r.loser)||0; });
+      rebuildP(); saveLocal(); renderAll(); setSyncStatus('live','Live — synced'); }
     else setSyncStatus('live','Live');
   } catch(e){ setSyncStatus('error','Offline'); }
 }
@@ -690,8 +695,9 @@ function champBidBack(){
 function pickWinner(idx,winner){
   requireAdmin(()=>{
     const m=MS[idx]; const loser=m.tA===winner?m.tB:m.tA;
-    R[idx]={winner,loser,ts:Date.now()};
-    P[owner(winner)]=(P[owner(winner)]||0)+bid(loser);
+    const earned=bid(loser);
+    R[idx]={winner,loser,earned,ts:Date.now()};
+    P[owner(winner)]=(P[owner(winner)]||0)+earned;
     // If this is the final game (63rd), award champ bonus + bid back
     if(Object.keys(R).length===63){
       const allLosers=new Set(Object.values(R).map(r=>r.loser));
@@ -710,7 +716,7 @@ function undoResult(idx){
       const champ=[...MS.reduce((s,m)=>{s.add(m.tA);s.add(m.tB);return s;},new Set())].find(t=>!allLosers.has(t));
       if(champ){ P[owner(champ)]=Math.max(0,(P[owner(champ)]||0)-bid(champ)-32); }
     }
-    P[owner(r.winner)]=Math.max(0,(P[owner(r.winner)]||0)-bid(r.loser));
+    P[owner(r.winner)]=Math.max(0,(P[owner(r.winner)]||0)-(r.earned!==undefined?r.earned:bid(r.loser)));
     delete R[idx]; saveLocal(); if(syncCfg) syncPush(); renderAll();
   });
 }
@@ -1171,17 +1177,20 @@ function renderLog(){
   if(!rawEntries.length){no.style.display='block';le.innerHTML='';return;}
   no.style.display='none';
   le.innerHTML=[...rawEntries].sort((a,b)=>(b[1].ts||0)-(a[1].ts||0)||parseInt(b[0])-parseInt(a[0])).map(([i,rv])=>{
-    const m=MS[i]; const e={reg:m.r,winner:rv.winner,loser:rv.loser,wo:owner(rv.winner),earned:bid(rv.loser),mi:parseInt(i)};
+    const m=MS[i]; const reg=m?m.r:'';
+    const earned=rv.earned!==undefined?rv.earned:bid(rv.loser);
+    const wo=owner(rv.winner);
+    const mi=parseInt(i);
     return `<div class="log-entry">
     <div>
-      <span style="color:${COLORS[e.wo]||'#888'};font-weight:700">${e.wo}</span>
+      <span style="color:${COLORS[wo]||'#888'};font-weight:700">${wo}</span>
       <span style="color:var(--muted)"> earned </span>
-      <span style="color:var(--green);font-family:'DM Mono',monospace">+$${e.earned}</span>
-      <span style="color:var(--muted)"> — ${e.winner} beat ${e.loser}</span>
+      <span style="color:var(--green);font-family:'DM Mono',monospace">+$${earned}</span>
+      <span style="color:var(--muted)"> — ${rv.winner} beat ${rv.loser}</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px">
-      <span style="font-size:11px;color:${RC[e.reg]||'var(--purple)'}">${e.reg}</span>
-      <button onclick="editResult(${e.mi})" style="background:var(--bg4);border:1px solid var(--border);color:var(--blue);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px;font-family:'Syne',sans-serif">✎ Edit</button>
+      <span style="font-size:11px;color:${RC[reg]||'var(--purple)'}">${reg}</span>
+      <button onclick="editResult(${mi})" style="background:var(--bg4);border:1px solid var(--border);color:var(--blue);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px;font-family:'Syne',sans-serif">✎ Edit</button>
     </div>
   </div>`;}).join('');
 }
@@ -1368,8 +1377,9 @@ async function pollESPN(silent = true) {
     );
     if (mi < 0 || R[mi]) continue;
 
-    R[mi] = {winner: winnerName, loser: loserName, ts: Date.now()};
-    P[owner(winnerName)] = (P[owner(winnerName)]||0) + bid(loserName);
+    const earned = bid(loserName);
+    R[mi] = {winner: winnerName, loser: loserName, earned, ts: Date.now()};
+    P[owner(winnerName)] = (P[owner(winnerName)]||0) + earned;
     // If this completes all 63 games, award champ bonus + bid back
     if(Object.keys(R).length===63){
       const allLosers=new Set(Object.values(R).map(r=>r.loser));
