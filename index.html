@@ -556,8 +556,23 @@ function renderAdminStatus() {
   }
 }
 
+function rebuildP() {
+  P = {};
+  // Replay every result in bracket order to recompute P from scratch
+  Object.entries(R).forEach(([idx, r]) => {
+    P[owner(r.winner)] = (P[owner(r.winner)]||0) + bid(r.loser);
+  });
+  // If tournament is complete (63 results), add champ bonus + bid back
+  if(Object.keys(R).length === 63) {
+    const allLosers = new Set(Object.values(R).map(r=>r.loser));
+    const champ = [...MS.reduce((s,m)=>{s.add(m.tA);s.add(m.tB);return s;},new Set())].find(t=>!allLosers.has(t));
+    if(champ) P[owner(champ)] = (P[owner(champ)]||0) + bid(champ) + 32;
+  }
+}
+
 function loadLocal() {
   try { const s=JSON.parse(localStorage.getItem('ts26v3')||'{}'); R=s.R||{}; P=s.P||{}; PAID=s.PAID||{}; } catch(e){}
+  rebuildP(); // always recompute P from R to prevent corruption
 }
 function saveLocal() { localStorage.setItem('ts26v3', JSON.stringify({R,P,PAID})); }
 function isPaid(p) { return p in PAID ? PAID[p] : PLAYERS.find(x=>x.id===p).paid; }
@@ -606,7 +621,7 @@ async function syncPull() {
     const data = await res.json();
     const remote = data.record||{};
     const h = JSON.stringify(remote);
-    if(h!==lastHash){ lastHash=h; R=remote.R||{}; P=remote.P||{}; PAID=remote.PAID||{}; saveLocal(); renderAll(); setSyncStatus('live','Live — synced'); }
+    if(h!==lastHash){ lastHash=h; R=remote.R||{}; P=remote.P||{}; PAID=remote.PAID||{}; rebuildP(); saveLocal(); renderAll(); setSyncStatus('live','Live — synced'); }
     else setSyncStatus('live','Live');
   } catch(e){ setSyncStatus('error','Offline'); }
 }
@@ -675,7 +690,7 @@ function champBidBack(){
 function pickWinner(idx,winner){
   requireAdmin(()=>{
     const m=MS[idx]; const loser=m.tA===winner?m.tB:m.tA;
-    R[idx]={winner,loser};
+    R[idx]={winner,loser,ts:Date.now()};
     P[owner(winner)]=(P[owner(winner)]||0)+bid(loser);
     // If this is the final game (63rd), award champ bonus + bid back
     if(Object.keys(R).length===63){
@@ -1155,7 +1170,7 @@ function renderLog(){
   const no=document.getElementById('no-log'), le=document.getElementById('log-entries');
   if(!rawEntries.length){no.style.display='block';le.innerHTML='';return;}
   no.style.display='none';
-  le.innerHTML=rawEntries.reverse().map(([i,rv])=>{
+  le.innerHTML=[...rawEntries].sort((a,b)=>(b[1].ts||0)-(a[1].ts||0)).map(([i,rv])=>{
     const m=MS[i]; const e={reg:m.r,winner:rv.winner,loser:rv.loser,wo:owner(rv.winner),earned:bid(rv.loser),mi:parseInt(i)};
     return `<div class="log-entry">
     <div>
@@ -1353,7 +1368,7 @@ async function pollESPN(silent = true) {
     );
     if (mi < 0 || R[mi]) continue;
 
-    R[mi] = {winner: winnerName, loser: loserName};
+    R[mi] = {winner: winnerName, loser: loserName, ts: Date.now()};
     P[owner(winnerName)] = (P[owner(winnerName)]||0) + bid(loserName);
     // If this completes all 63 games, award champ bonus + bid back
     if(Object.keys(R).length===63){
