@@ -574,7 +574,7 @@ function loadLocal() {
   try { const s=JSON.parse(localStorage.getItem('ts26v3')||'{}'); R=s.R||{}; P=s.P||{}; PAID=s.PAID||{}; } catch(e){}
   rebuildP(); // always recompute P from R to prevent corruption
 }
-function saveLocal() { localStorage.setItem('ts26v3', JSON.stringify({R,P,PAID})); }
+function saveLocal() { localStorage.setItem('ts26v3', JSON.stringify({R,PAID})); }
 function isPaid(p) { return p in PAID ? PAID[p] : PLAYERS.find(x=>x.id===p).paid; }
 function togglePaid(p) {
   requireAdmin(() => { PAID[p] = !isPaid(p); saveLocal(); if(syncCfg) syncPush(); renderAll(); });
@@ -605,7 +605,7 @@ async function syncPush() {
   try {
     const res = await fetch(`https://api.jsonbin.io/v3/b/${syncCfg.id}`,{
       method:'PUT', headers:{'Content-Type':'application/json','X-Master-Key':syncCfg.key},
-      body:JSON.stringify({R,P,PAID})
+      body:JSON.stringify({R,PAID})
     });
     setSyncStatus(res.ok?'live':'error', res.ok?'Synced':'Push failed');
     if(res.ok) saveLocal();
@@ -728,7 +728,7 @@ function doImport(){
   requireAdmin(()=>{
     try{
       const p=JSON.parse(document.getElementById('import-txt').value);
-      R=p.R||{}; P=p.P||{}; PAID=p.PAID||{}; saveLocal(); if(syncCfg) syncPush(); renderAll();
+      R=p.R||{}; PAID=p.PAID||{}; rebuildP(); saveLocal(); if(syncCfg) syncPush(); renderAll();
       document.getElementById('import-wrap').style.display='none';
       alert('Imported!');
     }catch(e){alert('Invalid JSON');}
@@ -737,7 +737,7 @@ function doImport(){
 function doReset(){
   requireAdmin(()=>{
     if(!confirm('Reset ALL results and payouts?')) return;
-    R={}; P={}; saveLocal(); if(syncCfg) syncPush(); renderAll();
+    R={}; rebuildP(); saveLocal(); if(syncCfg) syncPush(); renderAll();
   });
 }
 
@@ -1170,7 +1170,7 @@ function renderLog(){
   const no=document.getElementById('no-log'), le=document.getElementById('log-entries');
   if(!rawEntries.length){no.style.display='block';le.innerHTML='';return;}
   no.style.display='none';
-  le.innerHTML=[...rawEntries].sort((a,b)=>(b[1].ts||0)-(a[1].ts||0)).map(([i,rv])=>{
+  le.innerHTML=[...rawEntries].sort((a,b)=>(b[1].ts||0)-(a[1].ts||0)||parseInt(b[0])-parseInt(a[0])).map(([i,rv])=>{
     const m=MS[i]; const e={reg:m.r,winner:rv.winner,loser:rv.loser,wo:owner(rv.winner),earned:bid(rv.loser),mi:parseInt(i)};
     return `<div class="log-entry">
     <div>
