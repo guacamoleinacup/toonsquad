@@ -1155,7 +1155,7 @@ function renderLog(){
   const no=document.getElementById('no-log'), le=document.getElementById('log-entries');
   if(!rawEntries.length){no.style.display='block';le.innerHTML='';return;}
   no.style.display='none';
-  le.innerHTML=rawEntries.map(([i,rv])=>{
+  le.innerHTML=rawEntries.reverse().map(([i,rv])=>{
     const m=MS[i]; const e={reg:m.r,winner:rv.winner,loser:rv.loser,wo:owner(rv.winner),earned:bid(rv.loser),mi:parseInt(i)};
     return `<div class="log-entry">
     <div>
