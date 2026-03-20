@@ -557,12 +557,14 @@ function renderAdminStatus() {
 }
 
 function rebuildP() {
+  // P is now just a cache — recompute live from R always
   P = {};
   Object.values(R).forEach(r => {
-    const e = r.earned !== undefined ? r.earned : bid(r.loser); // use stored, fall back to lookup for old records
-    P[owner(r.winner)] = (P[owner(r.winner)]||0) + e;
+    const amt = r.earned !== undefined ? r.earned : bid(r.loser);
+    if(amt && owner(r.winner) !== '?') {
+      P[owner(r.winner)] = (P[owner(r.winner)]||0) + amt;
+    }
   });
-  // If tournament complete, add champ bonus + bid back
   if(Object.keys(R).length === 63) {
     const allLosers = new Set(Object.values(R).map(r=>r.loser));
     const champ = [...MS.reduce((s,m)=>{s.add(m.tA);s.add(m.tB);return s;},new Set())].find(t=>!allLosers.has(t));
@@ -572,11 +574,25 @@ function rebuildP() {
 
 function loadLocal() {
   try { const s=JSON.parse(localStorage.getItem('ts26v3')||'{}'); R=s.R||{}; PAID=s.PAID||{}; } catch(e){}
-  // Migrate old R entries that don't have earned stored
-  Object.values(R).forEach(r => { if(r.earned===undefined) r.earned=bid(r.loser)||0; });
   rebuildP();
 }
 function saveLocal() { localStorage.setItem('ts26v3', JSON.stringify({R,PAID})); }
+function earned(p) {
+  // Always compute live from R — never trust stored P
+  let total = 0;
+  Object.values(R).forEach(r => {
+    if(owner(r.winner) === p) {
+      total += r.earned !== undefined ? r.earned : bid(r.loser);
+    }
+  });
+  // Add champ bonus if applicable
+  if(Object.keys(R).length === 63) {
+    const allLosers = new Set(Object.values(R).map(r=>r.loser));
+    const champ = [...MS.reduce((s,m)=>{s.add(m.tA);s.add(m.tB);return s;},new Set())].find(t=>!allLosers.has(t));
+    if(champ && owner(champ) === p) total += bid(champ) + 32;
+  }
+  return total;
+}
 function isPaid(p) { return p in PAID ? PAID[p] : PLAYERS.find(x=>x.id===p).paid; }
 function togglePaid(p) {
   requireAdmin(() => { PAID[p] = !isPaid(p); saveLocal(); if(syncCfg) syncPush(); renderAll(); });
@@ -695,28 +711,14 @@ function champBidBack(){
 function pickWinner(idx,winner){
   requireAdmin(()=>{
     const m=MS[idx]; const loser=m.tA===winner?m.tB:m.tA;
-    const earned=bid(loser);
-    R[idx]={winner,loser,earned,ts:Date.now()};
-    P[owner(winner)]=(P[owner(winner)]||0)+earned;
-    // If this is the final game (63rd), award champ bonus + bid back
-    if(Object.keys(R).length===63){
-      const allLosers=new Set(Object.values(R).map(r=>r.loser));
-      const champ=[...MS.reduce((s,m)=>{s.add(m.tA);s.add(m.tB);return s;},new Set())].find(t=>!allLosers.has(t));
-      if(champ){ P[owner(champ)]=(P[owner(champ)]||0)+bid(champ)+32; }
-    }
+    const amt=bid(loser);
+    R[idx]={winner,loser,earned:amt,ts:Date.now()};
     saveLocal(); if(syncCfg) syncPush(); renderAll();
   });
 }
 function undoResult(idx){
   requireAdmin(()=>{
-    const r=R[idx]; if(!r) return;
-    // If undoing the final game, remove champ bonus + bid back first
-    if(Object.keys(R).length===63){
-      const allLosers=new Set(Object.values(R).map(rv=>rv.loser));
-      const champ=[...MS.reduce((s,m)=>{s.add(m.tA);s.add(m.tB);return s;},new Set())].find(t=>!allLosers.has(t));
-      if(champ){ P[owner(champ)]=Math.max(0,(P[owner(champ)]||0)-bid(champ)-32); }
-    }
-    P[owner(r.winner)]=Math.max(0,(P[owner(r.winner)]||0)-(r.earned!==undefined?r.earned:bid(r.loser)));
+    if(!R[idx]) return;
     delete R[idx]; saveLocal(); if(syncCfg) syncPush(); renderAll();
   });
 }
@@ -754,7 +756,7 @@ function renderAll(){
   renderHistory(); renderAnalytics();
 }
 function renderTicker(){
-  const banked=Object.values(P).reduce((a,b)=>a+b,0);
+  const banked=PLAYERS.reduce((sum,p)=>sum+earned(p.id),0);
   document.getElementById('t-banked').textContent='$'+banked.toFixed(2);
   document.getElementById('t-inplay').textContent='$'+(512-banked).toFixed(2);
   document.getElementById('t-alive').textContent=TEAMS.filter(t=>!isOut(t.n)).length;
@@ -1377,15 +1379,8 @@ async function pollESPN(silent = true) {
     );
     if (mi < 0 || R[mi]) continue;
 
-    const earned = bid(loserName);
-    R[mi] = {winner: winnerName, loser: loserName, earned, ts: Date.now()};
-    P[owner(winnerName)] = (P[owner(winnerName)]||0) + earned;
-    // If this completes all 63 games, award champ bonus + bid back
-    if(Object.keys(R).length===63){
-      const allLosers=new Set(Object.values(R).map(r=>r.loser));
-      const champ=[...MS.reduce((s,m)=>{s.add(m.tA);s.add(m.tB);return s;},new Set())].find(t=>!allLosers.has(t));
-      if(champ){ P[owner(champ)]=(P[owner(champ)]||0)+bid(champ)+32; }
-    }
+    const earnedAmt = bid(loserName);
+    R[mi] = {winner: winnerName, loser: loserName, earned: earnedAmt, ts: Date.now()};
     applied++;
   }
 
