@@ -1192,6 +1192,13 @@ function renderBracket(){
   const roundOrder = ['R64','R32','S16','E8','F4','Champ'];
   const roundRanges = {R64:[0,31],R32:[32,47],S16:[48,55],E8:[56,59],F4:[60,61],Champ:[62,62]};
 
+  // Remember which rounds are currently open before re-rendering
+  const openState = {};
+  roundOrder.forEach(round => {
+    const el = document.getElementById('round-body-'+round);
+    if(el) openState[round] = el.style.display !== 'none';
+  });
+
   // Determine current round
   let currentRound = 'R64';
   for (const round of roundOrder) {
@@ -1216,7 +1223,8 @@ function renderBracket(){
 
     const regionsInRound = [...new Set(roundMS.map(m=>m.r))];
     const roundDone = roundMS.filter(m=>R[m.i]).length;
-    const isOpen = round === currentRound;
+    // Use remembered open state if available, otherwise default to current round open only if not complete
+    const isOpen = round in openState ? openState[round] : (round === currentRound && !allComplete);
     const allComplete = roundDone === roundMS.length && roundMS.length > 0;
 
     const statusBadge = allComplete
