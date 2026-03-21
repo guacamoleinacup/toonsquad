@@ -2333,46 +2333,6 @@ function renderAnalytics() {
 loadLocal();
 aLoad();
 
-// ===== HARDCODED CONFIRMED RESULTS (overrides any corrupted stored data) =====
-// Last updated: Mar 20 2026 — all R64 results confirmed via ESPN
-const CONFIRMED_R = {
-  // Thu Mar 19 — chronological
-  1: {winner:'TCU',          loser:'OHIO ST',        earned:1,    ts:1742396100000}, // 11:15 AM CT
-  27:{winner:'NEBRASKA',     loser:'TROY',           earned:3.5,  ts:1742397600000}, // 11:40 AM CT
-  10:{winner:'HIGH POINT',   loser:'WISCONSIN',      earned:10,   ts:1742401200000}, // 12:50 PM CT
-  4: {winner:'LOUISVILLE',   loser:'SOUTH FLORIDA',  earned:5,    ts:1742400600000}, // 12:30 PM CT
-  0: {winner:'DUKE',         loser:'SIENA',          earned:0.5,  ts:1742404800000}, // 2:00 PM CT
-  26:{winner:'VANDERBILT',   loser:'MCNEESE',        earned:0.5,  ts:1742405700000}, // 2:15 PM CT
-  11:{winner:'ARKANSAS',     loser:"HAWAI'I",        earned:0.5,  ts:1742410200000}, // 3:27 PM CT
-  5: {winner:'MICH ST',      loser:'N DAKOTA ST',    earned:0.5,  ts:1742410500000}, // 3:27 PM CT
-  28:{winner:'VCU',          loser:'NORTH CAROLINA', earned:11.5, ts:1742420400000}, // 5:50 PM CT
-  16:{winner:'MICHIGAN',     loser:'HOWARD',         earned:0.5,  ts:1742422200000}, // 6:30 PM CT
-  30:{winner:'TEXAS A&M',    loser:'ST MARYS',       earned:10.5, ts:1742423100000}, // 6:35 PM CT
-  12:{winner:'TEXAS',        loser:'BYU',            earned:6,    ts:1742423400000}, // 6:35 PM CT
-  29:{winner:'ILLINOIS',     loser:'PENN',           earned:0.5,  ts:1742431500000}, // 8:55 PM CT
-  17:{winner:'ST LOUIS',     loser:'GEORGIA',        earned:4,    ts:1742432400000}, // 9:10 PM CT
-  31:{winner:'HOUSTON',      loser:'IDAHO',          earned:0.5,  ts:1742432700000}, // 9:15 PM CT
-  13:{winner:'GONZAGA',      loser:'KENNESAW ST',    earned:0.5,  ts:1742433000000}, // 9:24 PM CT
-  // Fri Mar 20 — chronological
-  22:{winner:'KENTUCKY',     loser:'SANTA CLARA',    earned:1.5,  ts:1742482200000}, // 11:15 AM CT
-  18:{winner:'TEXAS TECH',   loser:'AKRON',          earned:1,    ts:1742483400000}, // 11:40 AM CT
-  8: {winner:'ARIZONA',      loser:'LONG ISLAND',    earned:0.5,  ts:1742486700000}, // 12:35 PM CT
-  21:{winner:'VIRGINIA',     loser:'WRIGHT ST',      earned:0.5,  ts:1742487600000}, // 12:50 PM CT
-  23:{winner:'IOWA ST',      loser:'TENNESSE ST',    earned:0.5,  ts:1742491020000}, // 2:07 PM CT
-  19:{winner:'ALABAMA',      loser:'HOFSTRA',        earned:0.5,  ts:1742491860000}, // 2:21 PM CT
-  20:{winner:'TENNESSEE',    loser:'MIAMI OH',       earned:1.5,  ts:1742496720000}, // 3:32 PM CT
-  // Fri Mar 20 evening — chronological
-  9: {winner:'UTAH ST',      loser:'VILLANOVA',      earned:4,    ts:1742504040000}, // 3:14 PM CT
-  2: {winner:'ST. JOHNS',    loser:'NORTHERN IOWA',  earned:1,    ts:1742511900000}, // 6:25 PM CT
-  6: {winner:'UCLA',         loser:'UCF',            earned:5,    ts:1742511960000}, // 6:31 PM CT
-};
-// Merge confirmed results — only fill in missing entries, never overwrite existing ones
-// This preserves real ESPN timestamps for games already recorded
-Object.entries(CONFIRMED_R).forEach(([idx, rv]) => { if(!R[idx]) R[idx] = rv; });
-// Push corrected data to JSONBin so all devices sync correctly
-saveLocal();
-if(syncCfg) syncPush();
-
 renderAll();
 renderHistory();
 renderAnalytics();
