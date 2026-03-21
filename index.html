@@ -2012,7 +2012,7 @@ const HISTORY = [
       {player:'SKRAEMS', banked:164},
       {player:'DEEDS',   banked:105},
       {player:'CUP',     banked:74.5},
-      {player:'DEWEY',   banked:68.5},
+      {player:'DEW',   banked:68.5},
       {player:'RICK',    banked:32},
       {player:'BEAN',    banked:24},
       {player:'GUAC',    banked:23},
@@ -2055,7 +2055,7 @@ function renderHistory() {
     .sort((a,b)=>b.total-a.total);
 
   const HIST_COLORS = {
-    SKRAEMS:'#b06cff',DEEDS:'#ff6b35',CUP:'#ffd700',DEWEY:'#00d4ff',
+    SKRAEMS:'#b06cff',DEEDS:'#ff6b35',CUP:'#ffd700',DEW:'#00d4ff',
     RICK:'#ffad35',BEAN:'#4ea8ff',GUAC:'#3dd68c',JMACK:'#ff4d6d',
   };
 
@@ -2164,15 +2164,15 @@ const HIST_TEAMS = [
   {year:2025,team:'HIGH POINT',  seed:15,region:'Midwest', owner:'CUP',    bid:0.5,  earned:3},
   {year:2025,team:'UNC',         seed:11,region:'South',   owner:'CUP',    bid:1.5,  earned:0},
   {year:2025,team:'BRYANT',      seed:15,region:'South',   owner:'CUP',    bid:0.5,  earned:0},
-  // DEWEY confirmed $68.5: AUBURN(38)+ARIZONA(11)+UCONN(5.5)+MCNEESE(7)+KENTUCKY(7)=68.5
-  {year:2025,team:'KENTUCKY',    seed:3, region:'Midwest', owner:'DEWEY',  bid:11.5, earned:7},
-  {year:2025,team:'AUBURN',      seed:1, region:'South',   owner:'DEWEY',  bid:32,   earned:38},
-  {year:2025,team:'ARIZONA',     seed:4, region:'East',    owner:'DEWEY',  bid:10,   earned:11},
-  {year:2025,team:'UCONN',       seed:8, region:'West',    owner:'DEWEY',  bid:3.5,  earned:5.5},
-  {year:2025,team:'TROY',        seed:13,region:'Midwest', owner:'DEWEY',  bid:0.5,  earned:0},
-  {year:2025,team:'MCNEESE',     seed:12,region:'Midwest', owner:'DEWEY',  bid:1,    earned:7},
-  {year:2025,team:'MONTANA',     seed:14,region:'East',    owner:'DEWEY',  bid:1,    earned:0},
-  {year:2025,team:'MT ST MARYS', seed:16,region:'East',    owner:'DEWEY',  bid:0.5,  earned:0},
+  // DEW confirmed $68.5: AUBURN(38)+ARIZONA(11)+UCONN(5.5)+MCNEESE(7)+KENTUCKY(7)=68.5
+  {year:2025,team:'KENTUCKY',    seed:3, region:'Midwest', owner:'DEW',  bid:11.5, earned:7},
+  {year:2025,team:'AUBURN',      seed:1, region:'South',   owner:'DEW',  bid:32,   earned:38},
+  {year:2025,team:'ARIZONA',     seed:4, region:'East',    owner:'DEW',  bid:10,   earned:11},
+  {year:2025,team:'UCONN',       seed:8, region:'West',    owner:'DEW',  bid:3.5,  earned:5.5},
+  {year:2025,team:'TROY',        seed:13,region:'Midwest', owner:'DEW',  bid:0.5,  earned:0},
+  {year:2025,team:'MCNEESE',     seed:12,region:'Midwest', owner:'DEW',  bid:1,    earned:7},
+  {year:2025,team:'MONTANA',     seed:14,region:'East',    owner:'DEW',  bid:1,    earned:0},
+  {year:2025,team:'MT ST MARYS', seed:16,region:'East',    owner:'DEW',  bid:0.5,  earned:0},
   // SKRAEMS confirmed $164: FLORIDA(155)+PURDUE(8.5)+GONZAGA(0)+SAINT MARYS(0.5)=164
   // Florida $155 = wins(91.5) + bid-back(31.5) + champ bonus(32)
   {year:2025,team:'FLORIDA',     seed:1, region:'West',    owner:'SKRAEMS',bid:31.5, earned:155},
@@ -2221,7 +2221,7 @@ function renderAnalytics() {
   const el = document.getElementById('an-content');
   if (!el) return;
 
-  const HIST_COLORS = {SKRAEMS:'#b06cff',DEEDS:'#ff6b35',CUP:'#ffd700',DEWEY:'#00d4ff',RICK:'#ffad35',BEAN:'#4ea8ff',GUAC:'#3dd68c',JMACK:'#ff4d6d'};
+  const HIST_COLORS = {SKRAEMS:'#b06cff',DEEDS:'#ff6b35',CUP:'#ffd700',DEW:'#00d4ff',RICK:'#ffad35',BEAN:'#4ea8ff',GUAC:'#3dd68c',JMACK:'#ff4d6d'};
 
   // Build year datasets
   const years = [
