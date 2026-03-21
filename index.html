@@ -720,9 +720,9 @@ function setSyncStatus(s,msg){
 function startSync(){
   if(!syncCfg) return;
   setSyncStatus('','Connecting...');
-  syncPull();
+  syncPull().catch(()=>setSyncStatus('error','Offline'));
   if(syncIv) clearInterval(syncIv);
-  syncIv=setInterval(syncPull,8000);
+  syncIv=setInterval(()=>syncPull().catch(()=>{}),8000);
 }
 function saveSyncConfig(){
   const id=document.getElementById('bin-id').value.trim();
@@ -2414,9 +2414,7 @@ if(A.phase==='setup'){
 
 startSync();
 startESPNPoll();
-pollESPN(false);
-fetchBracketSchedule();
-setInterval(fetchBracketSchedule, 120000);
+pollESPN(false).catch(()=>{});
 </script>
 </body>
 </html>
