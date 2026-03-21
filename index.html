@@ -1256,14 +1256,12 @@ function renderLog(){
   const no=document.getElementById('no-log'), le=document.getElementById('log-entries');
   if(!rawEntries.length){no.style.display='block';le.innerHTML='';return;}
   no.style.display='none';
-  const roundName={R64:'R64',R32:'R32',S16:'S16',E8:'E8',F4:'F4',Champ:'Champ'};
+  const allMS=getMS();
   le.innerHTML=[...rawEntries].sort((a,b)=>(b[1].ts||0)-(a[1].ts||0)||parseInt(b[0])-parseInt(a[0])).map(([i,rv])=>{
     const idx=parseInt(i);
-    // Use base MS for R64 (0-31), dynamic for later rounds
-    const allMS=getMS();
     const m=allMS[idx];
     const reg=m?m.r:'';
-    const round=idx<32?'R64':m?m.round:'';
+    const round=idx<32?'':m?m.round:'';
     const earnedAmt=rv.earned!==undefined?rv.earned:bid(rv.loser);
     const wo=owner(rv.winner);
     return `<div class="log-entry">
@@ -1275,7 +1273,7 @@ function renderLog(){
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <span style="font-size:11px;color:${RC[reg]||'var(--purple)'}">${reg}</span>
-      ${round&&round!=='R64'?`<span style="font-size:10px;color:var(--muted);background:var(--bg4);padding:1px 6px;border-radius:4px">${round}</span>`:''}
+      ${round?`<span style="font-size:10px;color:var(--muted);background:var(--bg4);padding:1px 6px;border-radius:4px">${round}</span>`:''}
       <button onclick="editResult(${idx})" style="background:var(--bg4);border:1px solid var(--border);color:var(--blue);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px;font-family:'Syne',sans-serif">✎ Edit</button>
     </div>
   </div>`;}).join('');
@@ -1461,10 +1459,20 @@ async function pollESPN(silent = true) {
     const mi = getMS().findIndex(m =>
       (m.tA === nameA && m.tB === nameB) || (m.tA === nameB && m.tB === nameA)
     );
-    if (mi < 0 || R[mi]) continue;
+    if (mi < 0 || R[mi]) {
+      // If already recorded but ts is missing or looks wrong (< 2026), backfill from ESPN
+      if (mi >= 0 && R[mi] && game.date) {
+        const gameTs = new Date(game.date).getTime();
+        if (!R[mi].ts || R[mi].ts < 1742000000000) {
+          R[mi].ts = gameTs;
+        }
+      }
+      continue;
+    }
 
     const earnedAmt = bid(loserName);
-    R[mi] = {winner: winnerName, loser: loserName, earned: earnedAmt, ts: Date.now()};
+    const gameTs = game.date ? new Date(game.date).getTime() : Date.now();
+    R[mi] = {winner: winnerName, loser: loserName, earned: earnedAmt, ts: gameTs};
     applied++;
   }
 
