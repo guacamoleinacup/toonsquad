@@ -2449,14 +2449,9 @@ const CONFIRMED = {
 };
 Object.entries(CONFIRMED).forEach(([i,rv]) => { if(!R[parseInt(i)]) R[parseInt(i)] = rv; });
 
-renderAll();
 renderHistory();
 renderAnalytics();
 renderAdminStatus();
-// Fire pollESPN immediately so live/completed scores show on first load without waiting
-pollESPN(false);
-fetchBracketSchedule();
-setInterval(fetchBracketSchedule, 120000);
 if(A.phase==='setup'){
   renderAuctionSetup();
 } else {
@@ -2466,6 +2461,12 @@ if(A.phase==='setup'){
 }
 if(syncCfg) startSync();
 startESPNPoll();
+// Fire ESPN + schedule fetch immediately, then renderAll once both resolve
+Promise.all([pollESPN(false), fetchBracketSchedule()]).then(() => {
+  renderAll();
+  renderBracket();
+}).catch(() => renderAll());
+setInterval(fetchBracketSchedule, 120000);
 </script>
 </body>
 </html>
