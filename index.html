@@ -697,7 +697,7 @@ async function syncPull() {
     if(h!==lastHash){ lastHash=h; R=remote.R||{}; PAID=remote.PAID||{};
       // Migrate old entries missing earned
       Object.values(R).forEach(r => { if(r.earned===undefined) r.earned=bid(r.loser)||0; });
-      rebuildP(); saveLocal(); renderAll(); setSyncStatus('live','Live — synced'); }
+      rebuildP(); saveLocal(); renderAll(); renderHistory(); renderAnalytics(); setSyncStatus('live','Live — synced'); }
     else setSyncStatus('live','Live');
   } catch(e){ setSyncStatus('error','Offline'); }
 }
@@ -2389,14 +2389,15 @@ function renderAnalytics() {
 loadLocal();
 aLoad();
 
+// ===== INIT =====
+loadLocal();
+aLoad();
+
 renderAll();
 renderHistory();
 renderAnalytics();
 renderAdminStatus();
-// Fire pollESPN immediately so live/completed scores show on first load without waiting
-pollESPN(false);
-fetchBracketSchedule();
-setInterval(fetchBracketSchedule, 120000);
+
 if(A.phase==='setup'){
   renderAuctionSetup();
 } else {
@@ -2404,8 +2405,14 @@ if(A.phase==='setup'){
   document.getElementById('auction-live').style.display='block';
   renderAuctionLive();
 }
-if(syncCfg) startSync();
+
+// Start JSONBin sync immediately — this is the primary data source
+// Pull fires right away so data loads on first visit even with empty localStorage
+startSync();
 startESPNPoll();
+pollESPN(false);
+fetchBracketSchedule();
+setInterval(fetchBracketSchedule, 120000);
 </script>
 </body>
 </html>
