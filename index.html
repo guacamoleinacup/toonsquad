@@ -686,20 +686,30 @@ async function syncPush() {
 }
 async function syncPull() {
   if(!syncCfg) return;
+  const url = `https://api.jsonbin.io/v3/b/${syncCfg.id}/latest`;
+  const headers = {'X-Master-Key':syncCfg.key};
+  let data = null;
+  // Try direct first, then proxy fallback for Safari
+  const attempts = [
+    async () => { const r=await fetch(url,{headers,cache:'no-store'}); if(!r.ok) throw new Error('bad'); return r.json(); },
+    async () => { const r=await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}&t=${Date.now()}`,{cache:'no-store'}); const j=await r.json(); return JSON.parse(j.contents); },
+    async () => { const r=await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`,{cache:'no-store',headers}); return r.json(); },
+  ];
+  for(const attempt of attempts){
+    try{
+      data = await Promise.race([attempt(), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),8000))]);
+      if(data) break;
+    }catch(e){ continue; }
+  }
+  if(!data){ setSyncStatus('error','Pull failed'); return; }
   try {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${syncCfg.id}/latest`,{
-      headers:{'X-Master-Key':syncCfg.key}
-    });
-    if(!res.ok){ setSyncStatus('error','Pull failed'); return; }
-    const data = await res.json();
     const remote = data.record||{};
     const h = JSON.stringify(remote);
     if(h!==lastHash){ lastHash=h; R=remote.R||{}; PAID=remote.PAID||{};
-      // Migrate old entries missing earned
       Object.values(R).forEach(r => { if(r.earned===undefined) r.earned=bid(r.loser)||0; });
       rebuildP(); saveLocal(); renderAll(); renderHistory(); renderAnalytics(); setSyncStatus('live','Live — synced'); }
     else setSyncStatus('live','Live');
-  } catch(e){ setSyncStatus('error','Offline'); }
+  } catch(e){ setSyncStatus('error','Parse error'); }
 }
 function setSyncStatus(s,msg){
   const dot=document.getElementById('sync-dot');
@@ -2389,10 +2399,6 @@ function renderAnalytics() {
 loadLocal();
 aLoad();
 
-// ===== INIT =====
-loadLocal();
-aLoad();
-
 renderAll();
 renderHistory();
 renderAnalytics();
@@ -2406,8 +2412,6 @@ if(A.phase==='setup'){
   renderAuctionLive();
 }
 
-// Start JSONBin sync immediately — this is the primary data source
-// Pull fires right away so data loads on first visit even with empty localStorage
 startSync();
 startESPNPoll();
 pollESPN(false);
