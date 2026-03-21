@@ -697,7 +697,12 @@ async function syncPull() {
     if(h!==lastHash){ lastHash=h; R=remote.R||{}; PAID=remote.PAID||{};
       // Migrate old entries missing earned
       Object.values(R).forEach(r => { if(r.earned===undefined) r.earned=bid(r.loser)||0; });
-      rebuildP(); saveLocal(); renderAll(); setSyncStatus('live','Live — synced'); }
+      // Apply confirmed results to fix any gaps/errors in JSONBin data
+      let patched = false;
+      Object.entries(CONFIRMED).forEach(([i,rv]) => { if(!R[parseInt(i)]){ R[parseInt(i)]=rv; patched=true; } });
+      rebuildP(); saveLocal();
+      if(patched) syncPush();
+      renderAll(); setSyncStatus('live','Live — synced'); }
     else setSyncStatus('live','Live');
   } catch(e){ setSyncStatus('error','Offline'); }
 }
