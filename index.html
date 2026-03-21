@@ -2366,8 +2366,9 @@ const CONFIRMED_R = {
   2: {winner:'ST. JOHNS',    loser:'NORTHERN IOWA',  earned:1,    ts:1742511900000}, // 6:25 PM CT
   6: {winner:'UCLA',         loser:'UCF',            earned:5,    ts:1742511960000}, // 6:31 PM CT
 };
-// Merge confirmed results — confirmed takes priority over stored
-Object.entries(CONFIRMED_R).forEach(([idx, rv]) => { R[idx] = rv; });
+// Merge confirmed results — only fill in missing entries, never overwrite existing ones
+// This preserves real ESPN timestamps for games already recorded
+Object.entries(CONFIRMED_R).forEach(([idx, rv]) => { if(!R[idx]) R[idx] = rv; });
 // Push corrected data to JSONBin so all devices sync correctly
 saveLocal();
 if(syncCfg) syncPush();
