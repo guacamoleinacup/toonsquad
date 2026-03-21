@@ -1099,29 +1099,19 @@ function processESPNEvents(events) {
 }
 
 async function fetchBracketSchedule() {
-  // Fetch multiple days around the tournament (Mar 19 – Apr 7)
-  const dates = [];
-  const base = new Date('2026-03-19');
-  for(let i=0;i<20;i++){
-    const d=new Date(base); d.setDate(base.getDate()+i);
-    dates.push(d.toISOString().slice(0,10).replace(/-/g,''));
-  }
+  // All tournament dates — fetch in parallel for speed
+  const tournamentDates = ['20260321','20260322','20260323','20260327','20260328','20260329','20260330','20260403','20260404','20260405','20260407'];
+  const today = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const allDates = [...new Set([today, ...tournamentDates])];
 
-  // Always fetch today + tomorrow first for live/upcoming, then fill in the rest
-  const today=new Date().toISOString().slice(0,10).replace(/-/g,'');
-  const tomorrow=new Date(Date.now()+86400000).toISOString().slice(0,10).replace(/-/g,'');
-  const priorityDates=[...new Set([today,tomorrow,...dates])];
+  const results = await Promise.allSettled(allDates.map(date => {
+    const url = `https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?groups=100&limit=100&dates=${date}`;
+    return tryFetch(url);
+  }));
 
-  let fetched=0;
-  for(const date of priorityDates){
-    if(fetched>=6) break; // limit requests
-    const url=`https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?groups=100&limit=100&dates=${date}`;
-    const data=await tryFetch(url);
-    if(data?.events?.length>0){
-      processESPNEvents(data.events);
-      fetched++;
-    }
-  }
+  results.forEach(r => {
+    if(r.status==='fulfilled' && r.value?.events?.length>0) processESPNEvents(r.value.events);
+  });
   renderBracket();
 }
 
@@ -2449,6 +2439,7 @@ const CONFIRMED = {
 };
 Object.entries(CONFIRMED).forEach(([i,rv]) => { if(!R[parseInt(i)]) R[parseInt(i)] = rv; });
 
+renderAll();
 renderHistory();
 renderAnalytics();
 renderAdminStatus();
@@ -2461,11 +2452,9 @@ if(A.phase==='setup'){
 }
 if(syncCfg) startSync();
 startESPNPoll();
-// Fire ESPN + schedule fetch immediately, then renderAll once both resolve
-Promise.all([pollESPN(false), fetchBracketSchedule()]).then(() => {
-  renderAll();
-  renderBracket();
-}).catch(() => renderAll());
+// Fire ESPN immediately — renderBracket is called inside pollESPN once schedule data arrives
+pollESPN(false);
+fetchBracketSchedule();
 setInterval(fetchBracketSchedule, 120000);
 </script>
 </body>
