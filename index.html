@@ -1192,6 +1192,13 @@ function renderBracket(){
   const roundOrder = ['R64','R32','S16','E8','F4','Champ'];
   const roundRanges = {R64:[0,31],R32:[32,47],S16:[48,55],E8:[56,59],F4:[60,61],Champ:[62,62]};
 
+  // Remember which rounds are currently open before re-rendering
+  const openState = {};
+  roundOrder.forEach(round => {
+    const el = document.getElementById('round-body-'+round);
+    if(el) openState[round] = el.style.display !== 'none';
+  });
+
   // Determine current round
   let currentRound = 'R64';
   for (const round of roundOrder) {
@@ -1216,7 +1223,8 @@ function renderBracket(){
 
     const regionsInRound = [...new Set(roundMS.map(m=>m.r))];
     const roundDone = roundMS.filter(m=>R[m.i]).length;
-    const isOpen = round === currentRound;
+    // Use remembered open state if available, otherwise default to current round open only if not complete
+    const isOpen = round in openState ? openState[round] : (round === currentRound && !allComplete);
     const allComplete = roundDone === roundMS.length && roundMS.length > 0;
 
     const statusBadge = allComplete
@@ -1465,6 +1473,9 @@ async function pollESPN(silent = true) {
   processESPNEvents(allEvents);
   renderBracket();
 
+  // Build full matchup list once (not inside loop)
+  const fullMS = getMS();
+
   for (const game of completed) {
     const comps = game.competitions?.[0]?.competitors || [];
     if (comps.length < 2) continue;
@@ -1478,12 +1489,10 @@ async function pollESPN(silent = true) {
     const winnerName = scoreA > scoreB ? nameA : nameB;
     const loserName  = scoreA > scoreB ? nameB : nameA;
 
-    const mi = getMS().findIndex(m =>
+    const mi = fullMS.findIndex(m =>
       (m.tA === nameA && m.tB === nameB) || (m.tA === nameB && m.tB === nameA)
     );
     if (mi < 0 || R[mi]) {
-      // Always sync the timestamp from ESPN's game.date — this is the tip time, not Date.now()
-      // This ensures payout log sorts by actual game schedule regardless of when result was entered
       if (mi >= 0 && R[mi] && game.date) {
         R[mi].ts = new Date(game.date).getTime();
       }
@@ -1496,8 +1505,7 @@ async function pollESPN(silent = true) {
     applied++;
   }
 
-  // Update timestamps on existing results from ESPN game.date (always authoritative)
-  // Then save so corrected ts values persist to JSONBin
+  // Update timestamps on existing results from ESPN game.date
   let tsUpdated = 0;
   for (const game of allEvents) {
     if (!game.date || !game.status?.type?.completed) continue;
@@ -1506,7 +1514,7 @@ async function pollESPN(silent = true) {
     const nameA = espnName(comps[0].team?.displayName || comps[0].team?.shortDisplayName);
     const nameB = espnName(comps[1].team?.displayName || comps[1].team?.shortDisplayName);
     if (!nameA || !nameB) continue;
-    const mi = getMS().findIndex(m =>
+    const mi = fullMS.findIndex(m =>
       (m.tA === nameA && m.tB === nameB) || (m.tA === nameB && m.tB === nameA)
     );
     if (mi >= 0 && R[mi]) {
