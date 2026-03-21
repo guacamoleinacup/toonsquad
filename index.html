@@ -1483,6 +1483,9 @@ async function pollESPN(silent = true) {
   processESPNEvents(allEvents);
   renderBracket();
 
+  // Build full matchup list once (not inside loop)
+  const fullMS = getMS();
+
   for (const game of completed) {
     const comps = game.competitions?.[0]?.competitors || [];
     if (comps.length < 2) continue;
@@ -1496,12 +1499,10 @@ async function pollESPN(silent = true) {
     const winnerName = scoreA > scoreB ? nameA : nameB;
     const loserName  = scoreA > scoreB ? nameB : nameA;
 
-    const mi = getMS().findIndex(m =>
+    const mi = fullMS.findIndex(m =>
       (m.tA === nameA && m.tB === nameB) || (m.tA === nameB && m.tB === nameA)
     );
     if (mi < 0 || R[mi]) {
-      // Always sync the timestamp from ESPN's game.date — this is the tip time, not Date.now()
-      // This ensures payout log sorts by actual game schedule regardless of when result was entered
       if (mi >= 0 && R[mi] && game.date) {
         R[mi].ts = new Date(game.date).getTime();
       }
@@ -1514,8 +1515,7 @@ async function pollESPN(silent = true) {
     applied++;
   }
 
-  // Update timestamps on existing results from ESPN game.date (always authoritative)
-  // Then save so corrected ts values persist to JSONBin
+  // Update timestamps on existing results from ESPN game.date
   let tsUpdated = 0;
   for (const game of allEvents) {
     if (!game.date || !game.status?.type?.completed) continue;
@@ -1524,7 +1524,7 @@ async function pollESPN(silent = true) {
     const nameA = espnName(comps[0].team?.displayName || comps[0].team?.shortDisplayName);
     const nameB = espnName(comps[1].team?.displayName || comps[1].team?.shortDisplayName);
     if (!nameA || !nameB) continue;
-    const mi = getMS().findIndex(m =>
+    const mi = fullMS.findIndex(m =>
       (m.tA === nameA && m.tB === nameB) || (m.tA === nameB && m.tB === nameA)
     );
     if (mi >= 0 && R[mi]) {
@@ -2398,12 +2398,12 @@ function renderAnalytics() {
 // ===== INIT =====
 loadLocal();
 aLoad();
-
 renderAll();
 renderHistory();
 renderAnalytics();
 renderAdminStatus();
-
+fetchBracketSchedule();
+setInterval(fetchBracketSchedule, 120000);
 if(A.phase==='setup'){
   renderAuctionSetup();
 } else {
@@ -2411,10 +2411,8 @@ if(A.phase==='setup'){
   document.getElementById('auction-live').style.display='block';
   renderAuctionLive();
 }
-
-startSync();
+if(syncCfg) startSync();
 startESPNPoll();
-pollESPN(false).catch(()=>{});
 </script>
 </body>
 </html>
