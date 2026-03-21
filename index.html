@@ -1460,12 +1460,10 @@ async function pollESPN(silent = true) {
       (m.tA === nameA && m.tB === nameB) || (m.tA === nameB && m.tB === nameA)
     );
     if (mi < 0 || R[mi]) {
-      // If already recorded but ts is missing or looks wrong (< 2026), backfill from ESPN
+      // Always sync the timestamp from ESPN's game.date — this is the tip time, not Date.now()
+      // This ensures payout log sorts by actual game schedule regardless of when result was entered
       if (mi >= 0 && R[mi] && game.date) {
-        const gameTs = new Date(game.date).getTime();
-        if (!R[mi].ts || R[mi].ts < 1742000000000) {
-          R[mi].ts = gameTs;
-        }
+        R[mi].ts = new Date(game.date).getTime();
       }
       continue;
     }
@@ -1475,6 +1473,26 @@ async function pollESPN(silent = true) {
     R[mi] = {winner: winnerName, loser: loserName, earned: earnedAmt, ts: gameTs};
     applied++;
   }
+
+  // Update timestamps on existing results from ESPN game.date (always authoritative)
+  // Then save so corrected ts values persist to JSONBin
+  let tsUpdated = 0;
+  for (const game of allEvents) {
+    if (!game.date || !game.status?.type?.completed) continue;
+    const comps = game.competitions?.[0]?.competitors || [];
+    if (comps.length < 2) continue;
+    const nameA = espnName(comps[0].team?.displayName || comps[0].team?.shortDisplayName);
+    const nameB = espnName(comps[1].team?.displayName || comps[1].team?.shortDisplayName);
+    if (!nameA || !nameB) continue;
+    const mi = getMS().findIndex(m =>
+      (m.tA === nameA && m.tB === nameB) || (m.tA === nameB && m.tB === nameA)
+    );
+    if (mi >= 0 && R[mi]) {
+      const correctTs = new Date(game.date).getTime();
+      if (R[mi].ts !== correctTs) { R[mi].ts = correctTs; tsUpdated++; }
+    }
+  }
+  if (tsUpdated > 0) { saveLocal(); if (syncCfg) syncPush(); }
 
   if (applied > 0) {
     saveLocal();
