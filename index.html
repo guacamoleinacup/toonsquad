@@ -2390,6 +2390,20 @@ function renderAnalytics() {
 loadLocal();
 aLoad();
 
+// One-time patch: fill any missing R64 results + confirmed R32 results
+// Only fills gaps — never overwrites existing entries
+const PATCH = {
+  // Late Friday R64 games (may have been missed while site was broken)
+  3: {winner:'KANSAS',    loser:'CA BAPTIST',  earned:0.5,  ts:1774074420000}, // Fri 9:07 PM CT
+  7: {winner:'UCONN',     loser:'FURMAN',      earned:0.5,  ts:1774075860000}, // Fri 9:31 PM CT
+  14:{winner:'MIAMI',     loser:'MISSOURI',    earned:1,    ts:1774076820000}, // Fri 9:10 PM CT
+  24:{winner:'FLORIDA',   loser:'PRAIRIE VIEW',earned:0.5,  ts:1774072980000}, // Fri 8:43 PM CT
+  // Completed R32 games
+  34:{winner:'MICH ST',   loser:'LOUISVILLE',  earned:6,    ts:1774122480000}, // Sat 1:48 PM CT
+  40:{winner:'MICHIGAN',  loser:'ST LOUIS',    earned:5.5,  ts:1774116600000}, // Sat 11:10 AM CT
+};
+Object.entries(PATCH).forEach(([idx, rv]) => { if(!R[idx]) R[idx] = rv; });
+
 renderAll();
 renderHistory();
 renderAnalytics();
