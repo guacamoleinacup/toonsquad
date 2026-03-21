@@ -520,6 +520,76 @@ function tInfo(n) { return TEAMS.find(t=>t.n===n)||{o:'?',s:'?',b:0}; }
 function owner(n) { return tInfo(n).o; }
 function bid(n)   { return tInfo(n).b; }
 
+// ===== DYNAMIC BRACKET =====
+// MS starts with 32 R64 games. getFullMS() appends R32/S16/E8/F4/Champ
+// based on who has won so far. Each region's 8 R64 games produce 4 R32 matchups etc.
+// R64 indices 0-7=East, 8-15=West, 16-23=Midwest, 24-31=South
+// R32 indices 32-47, S16 48-55, E8 56-59, F4 60-61, Champ 62
+
+function winnerOf(idx) {
+  return R[idx] ? R[idx].winner : null;
+}
+
+function buildDynamicMS() {
+  const full = [...MS]; // copy R64
+
+  // R32: winners of paired R64 games play each other
+  // East: (0v1),(2v3),(4v5),(6v7) → indices 32,33,34,35
+  // West: (8v9),(10v11),(12v13),(14v15) → 36,37,38,39
+  // Midwest: (16v17),(18v19),(20v21),(22v23) → 40,41,42,43
+  // South: (24v25),(26v27),(28v29),(30v31) → 44,45,46,47
+  const r64Pairs = [
+    [0,1],[2,3],[4,5],[6,7],     // East
+    [8,9],[10,11],[12,13],[14,15], // West
+    [16,17],[18,19],[20,21],[22,23], // Midwest
+    [24,25],[26,27],[28,29],[30,31], // South
+  ];
+  const regions32 = ['East','East','East','East','West','West','West','West','Midwest','Midwest','Midwest','Midwest','South','South','South','South'];
+
+  r64Pairs.forEach(([a,b], i) => {
+    const tA = winnerOf(a) || `W${a}`;
+    const tB = winnerOf(b) || `W${b}`;
+    full.push({r: regions32[i], round:'R32', tA, tB, sA:0, sB:0, dynamic:true});
+  });
+
+  // S16: winners of R32 pairs → indices 48-55
+  // East: (32v33),(34v35) → 48,49
+  // West: (36v37),(38v39) → 50,51
+  // Midwest: (40v41),(42v43) → 52,53
+  // South: (44v45),(46v47) → 54,55
+  const r32Pairs = [[32,33],[34,35],[36,37],[38,39],[40,41],[42,43],[44,45],[46,47]];
+  const regions16 = ['East','East','West','West','Midwest','Midwest','South','South'];
+
+  r32Pairs.forEach(([a,b], i) => {
+    const tA = winnerOf(a) || `W${a}`;
+    const tB = winnerOf(b) || `W${b}`;
+    full.push({r: regions16[i], round:'S16', tA, tB, sA:0, sB:0, dynamic:true});
+  });
+
+  // E8: winners of S16 pairs → indices 56-59
+  // East: (48v49)→56, West:(50v51)→57, Midwest:(52v53)→58, South:(54v55)→59
+  const s16Pairs = [[48,49],[50,51],[52,53],[54,55]];
+  const regionsE8 = ['East','West','Midwest','South'];
+
+  s16Pairs.forEach(([a,b], i) => {
+    const tA = winnerOf(a) || `W${a}`;
+    const tB = winnerOf(b) || `W${b}`;
+    full.push({r: regionsE8[i], round:'E8', tA, tB, sA:0, sB:0, dynamic:true});
+  });
+
+  // F4: East vs West (56v57)→60, Midwest vs South (58v59)→61
+  full.push({r:'Final Four', round:'F4', tA: winnerOf(56)||`W56`, tB: winnerOf(57)||`W57`, sA:0, sB:0, dynamic:true});
+  full.push({r:'Final Four', round:'F4', tA: winnerOf(58)||`W58`, tB: winnerOf(59)||`W59`, sA:0, sB:0, dynamic:true});
+
+  // Championship: (60v61)→62
+  full.push({r:'Championship', round:'Champ', tA: winnerOf(60)||`W60`, tB: winnerOf(61)||`W61`, sA:0, sB:0, dynamic:true});
+
+  return full;
+}
+
+// Replace static MS lookups with dynamic version
+function getMS() { return buildDynamicMS(); }
+
 // ===== STATE =====
 let R = {}, P = {}, PAID = {}; // R = results {idx:{winner,loser}}, P = payouts {player:$}, PAID = overrides
 let syncCfg = JSON.parse(localStorage.getItem('ts26sync')||'null') || {id:'69bb1c39c3097a1dd539a41a',key:'$2a$10$bi8u/5Db8qyxEsv/QYyvuu03trS2sjASrsf0TXa.m3CIfARihdZdS'};
@@ -567,7 +637,7 @@ function rebuildP() {
   });
   if(Object.keys(R).length === 63) {
     const allLosers = new Set(Object.values(R).map(r=>r.loser));
-    const champ = [...MS.reduce((s,m)=>{s.add(m.tA);s.add(m.tB);return s;},new Set())].find(t=>!allLosers.has(t));
+    const champ = [...getMS().reduce((s,m)=>{s.add(m.tA);s.add(m.tB);return s;},new Set())].find(t=>!allLosers.has(t));
     if(champ) P[owner(champ)] = (P[owner(champ)]||0) + bid(champ) + 32;
   }
 }
@@ -588,7 +658,7 @@ function earned(p) {
   // Add champ bonus if applicable
   if(Object.keys(R).length === 63) {
     const allLosers = new Set(Object.values(R).map(r=>r.loser));
-    const champ = [...MS.reduce((s,m)=>{s.add(m.tA);s.add(m.tB);return s;},new Set())].find(t=>!allLosers.has(t));
+    const champ = [...getMS().reduce((s,m)=>{s.add(m.tA);s.add(m.tB);return s;},new Set())].find(t=>!allLosers.has(t));
     if(champ && owner(champ) === p) total += bid(champ) + 32;
   }
   return total;
@@ -603,7 +673,7 @@ function aliveCount(p) { return TEAMS.filter(t=>t.o===p&&!isOut(t.n)).length; }
 function potential(p) {
   let tot=0;
   TEAMS.filter(t=>t.o===p&&!isOut(t.n)).forEach(t=>{
-    MS.forEach((m,i)=>{
+    getMS().forEach((m,i)=>{
       if(!R[i]){
         if(m.tA===t.n) tot+=bid(m.tB);
         else if(m.tB===t.n) tot+=bid(m.tA);
@@ -691,7 +761,7 @@ function isChampion(teamName){
   const totalGames = Object.keys(R).length;
   const wins = Object.values(R).filter(r=>r.winner===teamName).length;
   const losses = Object.values(R).filter(r=>r.loser===teamName).length;
-  const remaining = MS.filter((m,i)=>!R[i]&&(m.tA===teamName||m.tB===teamName)).length;
+  const remaining = getMS().filter((m,i)=>!R[i]&&(m.tA===teamName||m.tB===teamName)).length;
   return losses===0 && wins>0 && remaining===0 && totalGames===63;
 }
 function champBidBack(){
@@ -710,7 +780,7 @@ function champBidBack(){
 }
 function pickWinner(idx,winner){
   requireAdmin(()=>{
-    const m=MS[idx]; const loser=m.tA===winner?m.tB:m.tA;
+    const m=getMS()[idx]; const loser=m.tA===winner?m.tB:m.tA;
     const amt=bid(loser);
     R[idx]={winner,loser,earned:amt,ts:Date.now()};
     saveLocal(); if(syncCfg) syncPush(); renderAll();
@@ -809,8 +879,8 @@ function renderTeams(){
         </div>
         ${pt.map(t=>{
           const out=isOut(t.n);
-          const mi=MS.findIndex((m,i)=>(m.tA===t.n||m.tB===t.n)&&!R[i]);
-          const opp=mi>=0?bid(MS[mi].tA===t.n?MS[mi].tB:MS[mi].tA):0;
+          const mi=getMS().findIndex((m,i)=>(m.tA===t.n||m.tB===t.n)&&!R[i]);
+          const opp=mi>=0?bid(getMS()[mi].tA===t.n?getMS()[mi].tB:getMS()[mi].tA):0;
           const sc=teamColor(t.n);
           return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;margin-bottom:6px;background:var(--bg3);border-radius:8px;border-left:3px solid ${out?'var(--red)':sc};opacity:${out?.6:1}">
             <div style="display:flex;align-items:center;gap:8px;min-width:0">
@@ -1070,19 +1140,37 @@ function getGameInfo(tA,tB){
 }
 
 function renderBracket(){
-  const regions=['East','West','Midwest','South'];
-  document.getElementById('bracket-wrap').innerHTML=regions.map(reg=>{
-    const ms=MS.map((m,i)=>({...m,i})).filter(m=>m.r===reg);
-    const regDone=ms.filter(m=>R[m.i]).length;
-    return `
-    <div style="margin-bottom:40px">
+  const fullMS = getMS();
+  const roundLabels = {R64:'Round of 64', R32:'Round of 32', S16:'Sweet 16', E8:'Elite 8', F4:'Final Four', Champ:'Championship'};
+  const roundOrder = ['R64','R32','S16','E8','F4','Champ'];
+
+  document.getElementById('bracket-wrap').innerHTML = roundOrder.map(round => {
+    const roundMS = fullMS.map((m,i)=>({...m,i})).filter(m => round==='R64' ? !m.dynamic : m.round===round);
+    if(!roundMS.length) return '';
+    // Only show rounds where at least one game from the prior round is done
+    const prevDone = round==='R64' ? true
+      : round==='R32'  ? Object.keys(R).some(i=>parseInt(i)<32)
+      : round==='S16'  ? Object.keys(R).some(i=>parseInt(i)>=32&&parseInt(i)<48)
+      : round==='E8'   ? Object.keys(R).some(i=>parseInt(i)>=48&&parseInt(i)<56)
+      : round==='F4'   ? Object.keys(R).some(i=>parseInt(i)>=56&&parseInt(i)<60)
+      : round==='Champ'? Object.keys(R).some(i=>parseInt(i)>=60&&parseInt(i)<62) : false;
+    if(!prevDone) return '';
+
+    const regionsInRound = [...new Set(roundMS.map(m=>m.r))];
+    const roundDone = roundMS.filter(m=>R[m.i]).length;
+
+    return `<div style="margin-bottom:40px">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-        <div style="width:5px;height:22px;background:${RC[reg]};border-radius:3px"></div>
-        <div style="font-size:16px;font-weight:800;color:${RC[reg]};text-transform:uppercase;letter-spacing:1.5px">${reg}</div>
-        <div style="font-size:12px;color:var(--muted);font-weight:400">${regDone}/${ms.length} played</div>
+        <div style="width:5px;height:22px;background:var(--accent);border-radius:3px"></div>
+        <div style="font-size:16px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:1.5px">${roundLabels[round]||round}</div>
+        <div style="font-size:12px;color:var(--muted);font-weight:400">${roundDone}/${roundMS.length} played</div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
-        ${ms.map(m=>{
+      ${regionsInRound.map(reg => {
+        const regMS = roundMS.filter(m=>m.r===reg);
+        return `
+        ${regionsInRound.length>1?`<div style="font-size:11px;font-weight:700;color:${RC[reg]||'var(--accent)'};text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">${reg}</div>`:''}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:16px">
+        ${regMS.map(m=>{
           const rv=R[m.i];
           const oA=owner(m.tA),oB=owner(m.tB);
           const ownerCA=COLORS[oA]||'#888',ownerCB=COLORS[oB]||'#888';
@@ -1091,95 +1179,63 @@ function renderBracket(){
           const gi=getGameInfo(m.tA,m.tB);
           const isLive=!!gi?.liveStr;
           const isDone=!!gi?.finalStr||wA||wB;
-
-          return `
-          <div style="background:var(--bg2);border:1px solid ${isLive?'var(--red)':isDone?'var(--border)':'var(--border2)'};border-radius:14px;overflow:hidden;${isLive?'box-shadow:0 0 0 1px rgba(255,77,109,.2)':''}">
-
-            <!-- Game meta: date / time / network / live score -->
+          const isPlaceholder=m.tA.startsWith('W')||m.tB.startsWith('W');
+          return `<div style="background:var(--bg2);border:1px solid ${isLive?'var(--red)':isDone?'var(--border)':'var(--border2)'};border-radius:14px;overflow:hidden;${isLive?'box-shadow:0 0 0 1px rgba(255,77,109,.2)':''}">
             <div style="padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;min-height:36px">
-              ${isLive ? `
-                <div style="display:flex;align-items:center;gap:6px">
-                  <span style="width:7px;height:7px;border-radius:50%;background:var(--red);display:inline-block;animation:pulse 1s infinite"></span>
-                  <span style="font-size:12px;font-weight:700;color:var(--red)">LIVE</span>
-                  <span style="font-size:12px;font-weight:700;color:var(--text)">${gi.liveStr}</span>
-                </div>
-              ` : gi?.finalStr ? `
-                <div style="font-size:12px;color:var(--muted)">Final: <strong style="color:var(--text)">${gi.finalStr}</strong></div>
-              ` : gi?.dateStr ? `
-                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                  <span style="font-size:12px;color:var(--text);font-weight:600">${gi.dateStr}</span>
-                  ${gi.timeStr?`<span style="font-size:12px;color:var(--accent2);font-weight:600">${gi.timeStr}</span>`:''}
-                </div>
-              ` : `<span style="font-size:11px;color:var(--muted)">Schedule TBD</span>`}
+              ${isLive?`<div style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:50%;background:var(--red);display:inline-block;animation:pulse 1s infinite"></span><span style="font-size:12px;font-weight:700;color:var(--red)">LIVE</span><span style="font-size:12px;font-weight:700;color:var(--text)">${gi.liveStr}</span></div>`
+              :gi?.finalStr?`<div style="font-size:12px;color:var(--muted)">Final: <strong style="color:var(--text)">${gi.finalStr}</strong></div>`
+              :gi?.dateStr?`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:12px;color:var(--text);font-weight:600">${gi.dateStr}</span>${gi.timeStr?`<span style="font-size:12px;color:var(--accent2);font-weight:600">${gi.timeStr}</span>`:''}</div>`
+              :`<span style="font-size:11px;color:var(--muted)">${isPlaceholder?'Awaiting prior results':'Schedule TBD'}</span>`}
               ${gi?.network?`<span style="font-size:11px;font-weight:700;color:var(--blue);background:rgba(78,168,255,.12);padding:3px 8px;border-radius:6px;letter-spacing:.5px">${gi.network}</span>`:''}
             </div>
-
-            <!-- Team A row -->
             <div style="display:flex;align-items:stretch;opacity:${wB?.45:1}">
               <div style="width:5px;background:${wA?'var(--green)':schoolCA};flex-shrink:0"></div>
-              <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:14px 14px;background:${wA?'rgba(61,214,140,.04)':''}">
+              <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:14px;">
                 <div style="display:flex;align-items:center;gap:10px">
-                  <span style="font-size:11px;font-family:'DM Mono',monospace;font-weight:600;color:var(--muted);background:var(--bg4);padding:3px 7px;border-radius:5px;min-width:24px;text-align:center">${m.sA}</span>
-                  <div>
-                    <div style="font-size:14px;font-weight:700;color:${wA?'var(--green)':'var(--text)'}">${m.tA} ${wA?'✓':''}</div>
-                    <div style="font-size:11px;color:${ownerCA};margin-top:1px;font-weight:600">${oA}</div>
-                  </div>
+                  ${m.sA?`<span style="font-size:11px;font-family:'DM Mono',monospace;font-weight:600;color:var(--muted);background:var(--bg4);padding:3px 7px;border-radius:5px;min-width:24px;text-align:center">${m.sA}</span>`:''}
+                  <div><div style="font-size:14px;font-weight:700;color:${wA?'var(--green)':'var(--text)'}">${m.tA}${wA?' ✓':''}</div><div style="font-size:11px;color:${ownerCA};margin-top:1px;font-weight:600">${oA!=='?'?oA:''}</div></div>
                 </div>
-                <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2)">$${bid(m.tA)}</div>
+                <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2)">${bid(m.tA)?'$'+bid(m.tA):''}</div>
               </div>
             </div>
-
-            <!-- VS divider -->
             <div style="height:1px;background:var(--border);margin-left:5px"></div>
-
-            <!-- Team B row -->
             <div style="display:flex;align-items:stretch;opacity:${wA?.45:1}">
               <div style="width:5px;background:${wB?'var(--green)':schoolCB};flex-shrink:0"></div>
-              <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:14px 14px;background:${wB?'rgba(61,214,140,.04)':''}">
+              <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:14px;">
                 <div style="display:flex;align-items:center;gap:10px">
-                  <span style="font-size:11px;font-family:'DM Mono',monospace;font-weight:600;color:var(--muted);background:var(--bg4);padding:3px 7px;border-radius:5px;min-width:24px;text-align:center">${m.sB}</span>
-                  <div>
-                    <div style="font-size:14px;font-weight:700;color:${wB?'var(--green)':'var(--text)'}">${m.tB} ${wB?'✓':''}</div>
-                    <div style="font-size:11px;color:${ownerCB};margin-top:1px;font-weight:600">${oB}</div>
-                  </div>
+                  ${m.sB?`<span style="font-size:11px;font-family:'DM Mono',monospace;font-weight:600;color:var(--muted);background:var(--bg4);padding:3px 7px;border-radius:5px;min-width:24px;text-align:center">${m.sB}</span>`:''}
+                  <div><div style="font-size:14px;font-weight:700;color:${wB?'var(--green)':'var(--text)'}">${m.tB}${wB?' ✓':''}</div><div style="font-size:11px;color:${ownerCB};margin-top:1px;font-weight:600">${oB!=='?'?oB:''}</div></div>
                 </div>
-                <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2)">$${bid(m.tB)}</div>
+                <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2)">${bid(m.tB)?'$'+bid(m.tB):''}</div>
               </div>
             </div>
-
-            <!-- Winner entry / result footer -->
             <div style="padding:10px 14px;border-top:1px solid var(--border);background:var(--bg3)">
-              ${rv ? `
-                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
-                  <span style="font-size:12px;color:var(--green);font-weight:600">✓ ${rv.winner} — ${owner(rv.winner)} earned $${bid(rv.loser).toFixed(2)}</span>
-                  <button onclick="editResult(${m.i})" style="background:var(--bg4);border:1px solid var(--border);color:var(--blue);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-family:'Syne',sans-serif;font-weight:600">✎ Edit</button>
-                </div>
-              ` : `
-                <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-                  <span style="font-size:11px;color:var(--muted);flex-shrink:0">Winner:</span>
-                  <button onclick="pickWinner(${m.i},'${m.tA}')" style="flex:1;background:var(--bg4);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-family:'Syne',sans-serif;font-weight:700;display:flex;align-items:center;gap:6px" onmouseover="this.style.borderColor='${schoolCA}';this.style.color='${schoolCA}'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">
-                    <span style="width:3px;height:14px;background:${schoolCA};border-radius:2px;flex-shrink:0"></span>${m.tA}
-                  </button>
-                  <button onclick="pickWinner(${m.i},'${m.tB}')" style="flex:1;background:var(--bg4);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-family:'Syne',sans-serif;font-weight:700;display:flex;align-items:center;gap:6px" onmouseover="this.style.borderColor='${schoolCB}';this.style.color='${schoolCB}'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">
-                    <span style="width:3px;height:14px;background:${schoolCB};border-radius:2px;flex-shrink:0"></span>${m.tB}
-                  </button>
-                </div>
-              `}
+              ${rv?`<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-size:12px;color:var(--green);font-weight:600">✓ ${rv.winner} — <span style="color:${COLORS[owner(rv.winner)]||'#888'}">${owner(rv.winner)}</span> +$${rv.earned||bid(rv.loser)}</span>
+                <button onclick="editResult(${m.i})" style="background:var(--bg4);border:1px solid var(--border);color:var(--blue);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-family:'Syne',sans-serif;font-weight:600">✎ Edit</button>
+              </div>`
+              :isPlaceholder?`<span style="font-size:11px;color:var(--muted)">Winner TBD</span>`
+              :`<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                <span style="font-size:11px;color:var(--muted);flex-shrink:0">Winner:</span>
+                <button onclick="pickWinner(${m.i},'${m.tA}')" style="flex:1;background:var(--bg4);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-family:'Syne',sans-serif;font-weight:700" onmouseover="this.style.borderColor='${schoolCA}'" onmouseout="this.style.borderColor='var(--border)'">${m.tA}</button>
+                <button onclick="pickWinner(${m.i},'${m.tB}')" style="flex:1;background:var(--bg4);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-family:'Syne',sans-serif;font-weight:700" onmouseover="this.style.borderColor='${schoolCB}'" onmouseout="this.style.borderColor='var(--border)'">${m.tB}</button>
+              </div>`}
             </div>
-
           </div>`;
         }).join('')}
-      </div>
+        </div>`;
+      }).join('')}
     </div>`;
-  }).join('');
+  }).filter(Boolean).join('');
 }
+
 function renderLog(){
   const rawEntries=Object.entries(R);
   const no=document.getElementById('no-log'), le=document.getElementById('log-entries');
   if(!rawEntries.length){no.style.display='block';le.innerHTML='';return;}
   no.style.display='none';
   le.innerHTML=[...rawEntries].sort((a,b)=>(b[1].ts||0)-(a[1].ts||0)||parseInt(b[0])-parseInt(a[0])).map(([i,rv])=>{
-    const m=MS[i]; const reg=m?m.r:'';
+    const m=getMS()[i]; const reg=m?m.r:'';
     const earned=rv.earned!==undefined?rv.earned:bid(rv.loser);
     const wo=owner(rv.winner);
     const mi=parseInt(i);
@@ -1218,8 +1274,8 @@ function showModal(pid){
     </div>
     ${pt.map(t=>{
       const out=isOut(t.n);
-      const mi=MS.findIndex((m,i)=>(m.tA===t.n||m.tB===t.n)&&!R[i]);
-      const opp=mi>=0?bid(MS[mi].tA===t.n?MS[mi].tB:MS[mi].tA):0;
+      const mi=getMS().findIndex((m,i)=>(m.tA===t.n||m.tB===t.n)&&!R[i]);
+      const opp=mi>=0?bid(getMS()[mi].tA===t.n?getMS()[mi].tB:getMS()[mi].tA):0;
       const sc=teamColor(t.n);
       return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;margin-bottom:6px;background:var(--bg3);border-radius:8px;border-left:3px solid ${out?'var(--red)':sc};opacity:${out?.6:1}">
         <div style="display:flex;align-items:center;gap:8px;min-width:0">
@@ -1374,7 +1430,7 @@ async function pollESPN(silent = true) {
     const winnerName = scoreA > scoreB ? nameA : nameB;
     const loserName  = scoreA > scoreB ? nameB : nameA;
 
-    const mi = MS.findIndex(m =>
+    const mi = getMS().findIndex(m =>
       (m.tA === nameA && m.tB === nameB) || (m.tA === nameB && m.tB === nameA)
     );
     if (mi < 0 || R[mi]) continue;
@@ -1432,7 +1488,7 @@ function showToast(msg) {
 // Edit result modal — lets you flip the winner or clear a result
 function editResult(mi) {
   requireAdmin(()=>{
-    const m = MS[mi];
+    const m = getMS()[mi];
     const rv = R[mi];
     const oA = owner(m.tA), oB = owner(m.tB);
     const cA = COLORS[oA]||'#888', cB = COLORS[oB]||'#888';
@@ -1457,7 +1513,7 @@ function editResult(mi) {
 function applyEditResult(mi, winner) {
   const rv = R[mi];
   if (rv) { P[owner(rv.winner)] = Math.max(0, (P[owner(rv.winner)]||0) - bid(rv.loser)); }
-  const m = MS[mi];
+  const m = getMS()[mi];
   const loser = m.tA === winner ? m.tB : m.tA;
   R[mi] = {winner, loser};
   P[owner(winner)] = (P[owner(winner)]||0) + bid(loser);
@@ -2075,13 +2131,13 @@ function get2026AnalyticsTeams() {
   return TEAMS.map(t => {
     // Sum earnings from all wins by this team
     let teamEarned = 0;
-    MS.forEach((m, i) => {
+    getMS().forEach((m, i) => {
       const rv = R[i];
       if (rv && rv.winner === t.n && owner(t.n) === t.o) {
         teamEarned += bid(rv.loser);
       }
     });
-    return {year:2026, team:t.n, seed:t.s, region: MS.find(m=>m.tA===t.n||m.tB===t.n)?.r||'', owner:t.o, bid:t.b, earned:teamEarned};
+    return {year:2026, team:t.n, seed:t.s, region: getMS().find(m=>m.tA===t.n||m.tB===t.n)?.r||'', owner:t.o, bid:t.b, earned:teamEarned};
   });
 }
 
