@@ -2403,6 +2403,47 @@ function renderAnalytics() {
 loadLocal();
 aLoad();
 
+// Confirmed results — these are authoritative and fill any gaps in R.
+// ts = ESPN game.date epoch. Never overwrites existing entries.
+const CONFIRMED = {
+  0: {winner:'DUKE',       loser:'SIENA',        earned:0.5,  ts:new Date('2026-03-19T19:00:00Z').getTime()},
+  1: {winner:'TCU',        loser:'OHIO ST',       earned:1,    ts:new Date('2026-03-19T16:15:00Z').getTime()},
+  2: {winner:'ST. JOHNS',  loser:'NORTHERN IOWA', earned:1,    ts:new Date('2026-03-20T23:25:00Z').getTime()},
+  3: {winner:'KANSAS',     loser:'CA BAPTIST',    earned:0.5,  ts:new Date('2026-03-21T02:07:00Z').getTime()},
+  4: {winner:'LOUISVILLE', loser:'SOUTH FLORIDA', earned:5,    ts:new Date('2026-03-19T17:30:00Z').getTime()},
+  5: {winner:'MICH ST',    loser:'N DAKOTA ST',   earned:0.5,  ts:new Date('2026-03-19T20:27:00Z').getTime()},
+  6: {winner:'UCLA',       loser:'UCF',           earned:5,    ts:new Date('2026-03-20T23:31:00Z').getTime()},
+  7: {winner:'UCONN',      loser:'FURMAN',        earned:0.5,  ts:new Date('2026-03-21T02:31:00Z').getTime()},
+  8: {winner:'ARIZONA',    loser:'LONG ISLAND',   earned:0.5,  ts:new Date('2026-03-20T17:35:00Z').getTime()},
+  9: {winner:'UTAH ST',    loser:'VILLANOVA',     earned:4,    ts:new Date('2026-03-20T20:14:00Z').getTime()},
+  10:{winner:'HIGH POINT', loser:'WISCONSIN',     earned:10,   ts:new Date('2026-03-19T17:50:00Z').getTime()},
+  11:{winner:'ARKANSAS',   loser:"HAWAI'I",       earned:0.5,  ts:new Date('2026-03-19T20:27:00Z').getTime()},
+  12:{winner:'TEXAS',      loser:'BYU',           earned:6,    ts:new Date('2026-03-19T23:35:00Z').getTime()},
+  13:{winner:'GONZAGA',    loser:'KENNESAW ST',   earned:0.5,  ts:new Date('2026-03-20T02:24:00Z').getTime()},
+  14:{winner:'MIAMI',      loser:'MISSOURI',      earned:1,    ts:new Date('2026-03-21T02:07:00Z').getTime()},
+  15:{winner:'PURDUE',     loser:'QUEENS',        earned:0.5,  ts:new Date('2026-03-20T23:35:00Z').getTime()},
+  16:{winner:'MICHIGAN',   loser:'HOWARD',        earned:0.5,  ts:new Date('2026-03-19T23:30:00Z').getTime()},
+  17:{winner:'ST LOUIS',   loser:'GEORGIA',       earned:4,    ts:new Date('2026-03-20T02:10:00Z').getTime()},
+  18:{winner:'TEXAS TECH', loser:'AKRON',         earned:1,    ts:new Date('2026-03-20T16:40:00Z').getTime()},
+  19:{winner:'ALABAMA',    loser:'HOFSTRA',       earned:0.5,  ts:new Date('2026-03-20T19:21:00Z').getTime()},
+  20:{winner:'TENNESSEE',  loser:'MIAMI OH',      earned:1.5,  ts:new Date('2026-03-20T20:32:00Z').getTime()},
+  21:{winner:'VIRGINIA',   loser:'WRIGHT ST',     earned:0.5,  ts:new Date('2026-03-20T17:50:00Z').getTime()},
+  22:{winner:'KENTUCKY',   loser:'SANTA CLARA',   earned:1.5,  ts:new Date('2026-03-20T16:15:00Z').getTime()},
+  23:{winner:'IOWA ST',    loser:'TENNESSE ST',   earned:0.5,  ts:new Date('2026-03-20T19:07:00Z').getTime()},
+  24:{winner:'FLORIDA',    loser:'PRAIRIE VIEW',  earned:0.5,  ts:new Date('2026-03-21T01:43:00Z').getTime()},
+  25:{winner:'IOWA',       loser:'CLEMSON',       earned:2.5,  ts:new Date('2026-03-20T22:50:00Z').getTime()},
+  26:{winner:'VANDERBILT', loser:'MCNEESE',       earned:0.5,  ts:new Date('2026-03-19T19:15:00Z').getTime()},
+  27:{winner:'NEBRASKA',   loser:'TROY',          earned:3.5,  ts:new Date('2026-03-19T16:40:00Z').getTime()},
+  28:{winner:'VCU',        loser:'NORTH CAROLINA',earned:11.5, ts:new Date('2026-03-19T22:50:00Z').getTime()},
+  29:{winner:'ILLINOIS',   loser:'PENN',          earned:0.5,  ts:new Date('2026-03-20T02:10:00Z').getTime()},
+  30:{winner:'TEXAS A&M',  loser:'ST MARYS',      earned:10.5, ts:new Date('2026-03-19T23:35:00Z').getTime()},
+  31:{winner:'HOUSTON',    loser:'IDAHO',         earned:0.5,  ts:new Date('2026-03-20T02:15:00Z').getTime()},
+  // R32
+  34:{winner:'MICH ST',    loser:'LOUISVILLE',    earned:6,    ts:new Date('2026-03-21T18:48:00Z').getTime()},
+  40:{winner:'MICHIGAN',   loser:'ST LOUIS',      earned:5.5,  ts:new Date('2026-03-21T16:10:00Z').getTime()},
+};
+Object.entries(CONFIRMED).forEach(([i,rv]) => { if(!R[parseInt(i)]) R[parseInt(i)] = rv; });
+
 renderAll();
 renderHistory();
 renderAnalytics();
