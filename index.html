@@ -1295,7 +1295,7 @@ function renderLog(){
   }
 
   le.innerHTML=[...rawEntries]
-    .sort((a,b)=>gameEpoch(parseInt(b[0]))-gameEpoch(parseInt(a[0])))
+    .sort((a,b)=>(b[1].ts||0)-(a[1].ts||0))
     .map(([i,rv])=>{
       const idx=parseInt(i);
       const m=allMS[idx];
