@@ -988,8 +988,8 @@ let espnSchedule = {
   // WEST — Thu/Fri
   'ARIZONA_LONG ISLAND':  {dateStr:'Fri Mar 20', timeStr:'12:35 PM CT', network:'CBS', liveStr:'', finalStr:''},
   'LONG ISLAND_ARIZONA':  {dateStr:'Fri Mar 20', timeStr:'12:35 PM CT', network:'CBS', liveStr:'', finalStr:''},
-  'VILLANOVA_UTAH ST':    {dateStr:'Fri Mar 20', timeStr:'3:10 PM CT', network:'TBS', liveStr:'', finalStr:''},
-  'UTAH ST_VILLANOVA':    {dateStr:'Fri Mar 20', timeStr:'3:10 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'VILLANOVA_UTAH ST':    {dateStr:'Fri Mar 20', timeStr:'3:14 PM CT', network:'TBS', liveStr:'', finalStr:''},
+  'UTAH ST_VILLANOVA':    {dateStr:'Fri Mar 20', timeStr:'3:14 PM CT', network:'TBS', liveStr:'', finalStr:''},
   'WISCONSIN_HIGH POINT': {dateStr:'Thu Mar 19', timeStr:'12:50 PM CT', network:'truTV', liveStr:'', finalStr:''},
   'HIGH POINT_WISCONSIN': {dateStr:'Thu Mar 19', timeStr:'12:50 PM CT', network:'truTV', liveStr:'', finalStr:''},
   "ARKANSAS_HAWAI'I":     {dateStr:'Thu Mar 19', timeStr:'3:25 PM CT', network:'TBS', liveStr:'', finalStr:''},
@@ -1161,10 +1161,8 @@ function makeBracketCard(m) {
   let footerHtml;
   if(rv) {
     footerHtml='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px"><span style="font-size:12px;color:var(--green);font-weight:600">\u2713 '+rv.winner+' — <span style="color:'+(COLORS[owner(rv.winner)]||'#888')+'">'+ owner(rv.winner)+'</span> +$'+(rv.earned||bid(rv.loser))+'</span><button onclick="editResult('+m.i+')" style="background:var(--bg3);border:1px solid var(--border);color:var(--blue);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">\u270e Edit</button></div>';
-  } else if(isPlaceholder) {
-    footerHtml='<span style="font-size:11px;color:var(--muted)">Winner TBD</span>';
   } else {
-    footerHtml='<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span style="font-size:11px;color:var(--muted);flex-shrink:0">Winner:</span>'+'<button onclick="pickWinner('+m.i+',\''+m.tA+'\')" style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700" onmouseover="this.style.borderColor=\''+schoolCA+'\'" onmouseout="this.style.borderColor=\'var(--border)\'">'+m.tA+'</button>'+'<button onclick="pickWinner('+m.i+',\''+m.tB+'\')" style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700" onmouseover="this.style.borderColor=\''+schoolCB+'\'" onmouseout="this.style.borderColor=\'var(--border)\'">'+m.tB+'</button></div>';
+    footerHtml='';
   }
 
   return '<div style="background:var(--bg3);border:1px solid '+border+';border-radius:14px;overflow:hidden;'+shadow+'">'
@@ -1184,7 +1182,7 @@ function makeBracketCard(m) {
           +'<div><div style="font-size:14px;font-weight:700;color:'+(wB?'var(--green)':'var(--text)')+'">'+m.tB+(wB?' \u2713':'')+'</div>'
           +'<div style="font-size:11px;color:'+ownerCB+';margin-top:1px;font-weight:600">'+(oB!=='?'?oB:'')+'</div></div></div>'
         +bidB+'</div></div>'
-    +'<div style="padding:10px 14px;border-top:1px solid var(--border);background:var(--bg4)">'+footerHtml+'</div>'
+    +(footerHtml?'<div style="padding:10px 14px;border-top:1px solid var(--border);background:var(--bg4)">'+footerHtml+'</div>':'')
     +'</div>';
 }
 
