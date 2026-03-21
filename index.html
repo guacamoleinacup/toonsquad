@@ -1199,15 +1199,16 @@ function renderBracket(){
     if(el) openState[round] = el.style.display !== 'none';
   });
 
-  // Determine current round
-  let currentRound = 'R64';
+  // Determine current round based purely on which R indices have results
+  let currentRound = 'R32'; // default to R32 since R64 is complete
   for (const round of roundOrder) {
     const [lo,hi] = roundRanges[round];
     const hasAny = Object.keys(R).some(i=>parseInt(i)>=lo&&parseInt(i)<=hi);
-    const roundMS = fullMS.map((m,i)=>({...m,i})).filter(m=>round==='R64'?!m.dynamic:m.round===round);
-    const allDone = roundMS.length > 0 && roundMS.every(m=>R[m.i]);
+    const roundSize = hi - lo + 1;
+    const doneCount = Object.keys(R).filter(i=>parseInt(i)>=lo&&parseInt(i)<=hi).length;
+    const allDone = hasAny && doneCount >= roundSize;
     if(hasAny && !allDone) { currentRound = round; break; }
-    if(hasAny && allDone) currentRound = round;
+    if(!hasAny && round !== 'R64') { currentRound = round; break; } // first round with no results yet
   }
 
   const html = roundOrder.map(round => {
