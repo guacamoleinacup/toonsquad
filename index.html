@@ -1100,7 +1100,7 @@ function processESPNEvents(events) {
 
 async function fetchBracketSchedule() {
   // All tournament dates — fetch in parallel for speed
-  const tournamentDates = ['20260321','20260322','20260323','20260327','20260328','20260329','20260330','20260403','20260404','20260405','20260407'];
+  const tournamentDates = ['20260321','20260322','20260323','20260326','20260327','20260328','20260329','20260330','20260403','20260404','20260405','20260407'];
   const today = new Date().toISOString().slice(0,10).replace(/-/g,'');
   const allDates = [...new Set([today, ...tournamentDates])];
 
@@ -1333,6 +1333,7 @@ function showModal(pid){
       <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;flex:1">Team</div>
       <div style="display:flex;gap:10px;flex-shrink:0;margin-left:8px">
         <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;min-width:28px;text-align:right">Bid</span>
+        <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;min-width:42px;text-align:right">Earned</span>
         <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;min-width:42px;text-align:right">Status</span>
         <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;min-width:28px;text-align:right">Next $</span>
       </div>
@@ -1342,6 +1343,8 @@ function showModal(pid){
       const mi=getMS().findIndex((m,i)=>(m.tA===t.n||m.tB===t.n)&&!R[i]);
       const opp=mi>=0?bid(getMS()[mi].tA===t.n?getMS()[mi].tB:getMS()[mi].tA):0;
       const sc=teamColor(t.n);
+      // Sum all earnings from wins by this team
+      const teamEarned = Object.values(R).filter(r=>r.winner===t.n).reduce((s,r)=>s+(r.earned||bid(r.loser)),0);
       return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;margin-bottom:6px;background:var(--bg3);border-radius:8px;border-left:3px solid ${out?'var(--red)':sc};opacity:${out?.6:1}">
         <div style="display:flex;align-items:center;gap:8px;min-width:0">
           <span class="sb" style="flex-shrink:0">#${t.s}</span>
@@ -1349,7 +1352,8 @@ function showModal(pid){
         </div>
         <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:8px">
           <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent2)">$${t.b}</span>
-          <span style="font-size:11px;color:${out?'var(--red)':'var(--green)'}">${out?'Out':'Active'}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--green);min-width:42px;text-align:right">${teamEarned>0?'+$'+teamEarned.toFixed(2):'—'}</span>
+          <span style="font-size:11px;color:${out?'var(--red)':'var(--green)'};min-width:42px;text-align:right">${out?'Out':'Active'}</span>
           <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--blue);min-width:28px;text-align:right">${!out&&opp?'$'+opp:'—'}</span>
         </div>
       </div>`;
@@ -2434,8 +2438,17 @@ const CONFIRMED = {
   30:{winner:'TEXAS A&M',  loser:'ST MARYS',      earned:10.5, ts:new Date('2026-03-19T23:35:00Z').getTime()},
   31:{winner:'HOUSTON',    loser:'IDAHO',         earned:0.5,  ts:new Date('2026-03-20T02:15:00Z').getTime()},
   // R32
-  34:{winner:'MICH ST',    loser:'LOUISVILLE',    earned:6,    ts:new Date('2026-03-21T18:48:00Z').getTime()},
-  40:{winner:'MICHIGAN',   loser:'ST LOUIS',      earned:5.5,  ts:new Date('2026-03-21T16:10:00Z').getTime()},
+  32:{winner:'DUKE',      loser:'TCU',        earned:5,    ts:new Date('2026-03-21T21:25:00Z').getTime()},
+  33:{winner:'ST. JOHNS', loser:'KANSAS',     earned:7,    ts:new Date('2026-03-22T21:25:00Z').getTime()},
+  34:{winner:'MICH ST',   loser:'LOUISVILLE', earned:6,    ts:new Date('2026-03-21T18:48:00Z').getTime()},
+  35:{winner:'UCONN',     loser:'UCLA',       earned:7.5,  ts:new Date('2026-03-23T01:10:00Z').getTime()},
+  36:{winner:'ARIZONA',   loser:'UTAH ST',    earned:2.5,  ts:new Date('2026-03-23T00:11:00Z').getTime()},
+  39:{winner:'PURDUE',    loser:'MIAMI',      earned:6,    ts:new Date('2026-03-22T16:10:00Z').getTime()},
+  40:{winner:'MICHIGAN',  loser:'ST LOUIS',   earned:5.5,  ts:new Date('2026-03-21T16:10:00Z').getTime()},
+  41:{winner:'ALABAMA',   loser:'TEXAS TECH', earned:6.5,  ts:new Date('2026-03-23T02:08:00Z').getTime()},
+  42:{winner:'TENNESSEE', loser:'VIRGINIA',   earned:14,   ts:new Date('2026-03-22T22:10:00Z').getTime()},
+  43:{winner:'IOWA ST',   loser:'KENTUCKY',   earned:3,    ts:new Date('2026-03-22T18:49:00Z').getTime()},
+  44:{winner:'IOWA',      loser:'FLORIDA',    earned:31,   ts:new Date('2026-03-22T23:10:00Z').getTime()},
 };
 Object.entries(CONFIRMED).forEach(([i,rv]) => { if(!R[parseInt(i)]) R[parseInt(i)] = rv; });
 
