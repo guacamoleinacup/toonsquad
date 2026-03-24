@@ -1334,7 +1334,6 @@ function showModal(pid){
       <div style="display:flex;gap:10px;flex-shrink:0;margin-left:8px">
         <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;min-width:28px;text-align:right">Bid</span>
         <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;min-width:42px;text-align:right">Earned</span>
-        <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;min-width:42px;text-align:right">Status</span>
         <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;min-width:28px;text-align:right">Next $</span>
       </div>
     </div>
@@ -1353,7 +1352,6 @@ function showModal(pid){
         <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:8px">
           <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent2)">$${t.b}</span>
           <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--green);min-width:42px;text-align:right">${teamEarned>0?'+$'+teamEarned.toFixed(2):'—'}</span>
-          <span style="font-size:11px;color:${out?'var(--red)':'var(--green)'};min-width:42px;text-align:right">${out?'Out':'Active'}</span>
           <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--blue);min-width:28px;text-align:right">${!out&&opp?'$'+opp:'—'}</span>
         </div>
       </div>`;
