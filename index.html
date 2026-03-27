@@ -1212,8 +1212,7 @@ function renderBracket(){
   else if(hasF4) currentRound = 'Champ';
   else if(hasE8 && doneE8 < 4) currentRound = 'E8';
   else if(hasE8) currentRound = 'F4';
-  else if(hasS16 && doneS16 < 8) currentRound = 'S16';
-  else if(hasS16) currentRound = 'E8';
+  else if(hasS16) currentRound = 'S16';
   else if(hasR32 && doneR32 < 16) currentRound = 'R32';
   else if(hasR32) currentRound = 'S16';
   else currentRound = 'R64';
@@ -1233,8 +1232,9 @@ function renderBracket(){
     const roundDone = roundMS.filter(m=>R[m.i]).length;
     // R64 is complete if any R32 results exist (ESPN is source of truth)
     const allComplete = round==='R64' ? hasR32 : (roundDone === roundMS.length && roundMS.length > 0);
-    // Use remembered open state if available and round isn't complete; otherwise default to current round
-    const isOpen = (round in openState && !allComplete) ? openState[round] : (round === currentRound && !allComplete);
+    // Open whichever round is currently in progress; preserve user toggle for others
+    const inProgress = roundDone > 0 && !allComplete;
+    const isOpen = round in openState ? openState[round] : inProgress;
 
     const statusBadge = allComplete
       ? '<span style="font-size:11px;background:rgba(61,214,140,.15);color:var(--green);padding:2px 8px;border-radius:20px;font-weight:600">Complete</span>'
