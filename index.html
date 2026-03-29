@@ -2117,32 +2117,38 @@ function renderHistory() {
       const sorted = [...yr.results].sort((a,b)=>b.banked-a.banked);
       const winner = sorted[0];
       const total = sorted.reduce((s,r)=>s+r.banked,0);
-      return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px">
+      const bodyId = `hist-body-${yr.year}`;
+      const isOpen = yr.live;
+      return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:${isOpen?'1px solid var(--border)':'none'};flex-wrap:wrap;gap:8px;cursor:pointer" onclick="const b=document.getElementById('${bodyId}');const open=b.style.display==='none';b.style.display=open?'block':'none';this.style.borderBottom=open?'1px solid var(--border)':'none'">
           <div style="display:flex;align-items:center;gap:12px">
             <div style="font-size:22px;font-weight:800">${yr.year}</div>
             ${yr.live?'<span style="font-size:11px;background:rgba(61,214,140,.15);color:var(--green);padding:3px 10px;border-radius:20px;font-weight:700">🔴 Live</span>':''}
           </div>
-          <div style="font-size:13px;color:var(--muted)">
-            🏆 <strong style="color:${HIST_COLORS[winner?.player]||'#888'}">${winner?.player||'—'}</strong>
-            <span style="font-family:'DM Mono',monospace;color:var(--gold)"> $${winner?.banked?.toFixed(2)||'0'}</span>
-            <span style="margin-left:12px;color:var(--muted)">Pool: <span style="font-family:'DM Mono',monospace;color:var(--text)">$${total.toFixed(2)}</span></span>
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <div style="font-size:13px;color:var(--muted)">
+              🏆 <strong style="color:${HIST_COLORS[winner?.player]||'#888'}">${winner?.player||'—'}</strong>
+              <span style="font-family:'DM Mono',monospace;color:var(--gold)"> $${winner?.banked?.toFixed(2)||'0'}</span>
+              <span style="margin-left:12px;color:var(--muted)">Pool: <span style="font-family:'DM Mono',monospace;color:var(--text)">$${total.toFixed(2)}</span></span>
+            </div>
+            <span style="font-size:14px;color:var(--muted)">${isOpen?'▾':'▸'}</span>
           </div>
         </div>
-        <div style="padding:8px 0">
-          ${sorted.map((r,i) => {
-            const c = HIST_COLORS[r.player]||'#888';
-            const pct = winner.banked > 0 ? (r.banked/winner.banked)*100 : 0;
-            return `<div style="display:flex;align-items:center;gap:12px;padding:10px 20px">
-              <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;width:20px;text-align:right">${i+1}</div>
-              <div style="font-size:14px;font-weight:700;color:${c};width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.player}</div>
-              <div style="flex:1;background:var(--bg4);border-radius:4px;height:6px;min-width:40px">
-                <div style="height:100%;border-radius:4px;background:${c};width:${pct.toFixed(1)}%;transition:width .4s"></div>
-              </div>
-              <div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:${i===0?'var(--gold)':'var(--text)'};min-width:70px;text-align:right">$${r.banked.toFixed(2)}</div>
-            </div>`;
-          }).join('')}
-        </div>
+        <div id="${bodyId}" style="display:${isOpen?'block':'none'}">
+          <div style="padding:8px 0">
+            ${sorted.map((r,i) => {
+              const c = HIST_COLORS[r.player]||'#888';
+              const pct = winner.banked > 0 ? (r.banked/winner.banked)*100 : 0;
+              return `<div style="display:flex;align-items:center;gap:12px;padding:10px 20px">
+                <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;width:20px;text-align:right">${i+1}</div>
+                <div style="font-size:14px;font-weight:700;color:${c};width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.player}</div>
+                <div style="flex:1;background:var(--bg4);border-radius:4px;height:6px;min-width:40px">
+                  <div style="height:100%;border-radius:4px;background:${c};width:${pct.toFixed(1)}%;transition:width .4s"></div>
+                </div>
+                <div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:${i===0?'var(--gold)':'var(--text)'};min-width:70px;text-align:right">$${r.banked.toFixed(2)}</div>
+              </div>`;
+            }).join('')}
+          </div>
       </div>`;
     }).join('');
   }
@@ -2363,12 +2369,18 @@ function renderAnalytics() {
       </div>`;
     }).join('') : `<div style="color:var(--muted);font-size:13px">No data yet — check back once games start</div>`;
 
+    const bodyId = `an-body-${yr.year}`;
+    const isOpen = yr.live;
     return `
-    <div style="margin-bottom:40px">
-      <div style="display:flex;align-items:center;margin-bottom:20px">
-        <div style="font-size:22px;font-weight:800">${yr.year}</div>
-        ${liveTag}
+    <div style="margin-bottom:24px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;border-bottom:${isOpen?'1px solid var(--border)':'none'}" onclick="const b=document.getElementById('${bodyId}');const open=b.style.display==='none';b.style.display=open?'block':'none';this.style.borderBottom=open?'1px solid var(--border)':'none'">
+        <div style="display:flex;align-items:center">
+          <div style="font-size:22px;font-weight:800">${yr.year}</div>
+          ${liveTag}
+        </div>
+        <span style="font-size:14px;color:var(--muted)">${isOpen?'▾':'▸'}</span>
       </div>
+      <div id="${bodyId}" style="display:${isOpen?'block':'none'};padding:20px">
 
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:14px">
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px">
@@ -2395,6 +2407,7 @@ function renderAnalytics() {
           <div style="font-size:12px;font-weight:700;margin-bottom:12px">💀 Biggest Busts</div>
           ${bustHTML}
         </div>
+      </div>
       </div>
     </div>`;
   }
