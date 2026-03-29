@@ -1486,8 +1486,11 @@ async function pollESPN(silent = true) {
   // Update live scores on bracket cards for ALL games (in-progress + completed)
   processESPNEvents(allEvents);
   // Ensure confirmed results are always in R before rendering
-  Object.entries(CONFIRMED).forEach(([i,rv]) => { if(JSON.stringify(R[parseInt(i)])!==JSON.stringify(rv)){R[parseInt(i)]=rv;} });
+  Object.entries(CONFIRMED).forEach(([i,rv]) => { if(!R[parseInt(i)]) R[parseInt(i)]=rv; });
   renderBracket();
+
+  // Build fullMS once with CONFIRMED applied so dynamic E8/F4/Champ matchups resolve correctly
+  const fullMS = getMS();
 
   for (const game of completed) {
     const comps = game.competitions?.[0]?.competitors || [];
@@ -1502,12 +1505,10 @@ async function pollESPN(silent = true) {
     const winnerName = scoreA > scoreB ? nameA : nameB;
     const loserName  = scoreA > scoreB ? nameB : nameA;
 
-    const mi = getMS().findIndex(m =>
+    const mi = fullMS.findIndex(m =>
       (m.tA === nameA && m.tB === nameB) || (m.tA === nameB && m.tB === nameA)
     );
     if (mi < 0 || R[mi]) {
-      // Always sync the timestamp from ESPN's game.date — this is the tip time, not Date.now()
-      // This ensures payout log sorts by actual game schedule regardless of when result was entered
       if (mi >= 0 && R[mi] && game.date) {
         R[mi].ts = new Date(game.date).getTime();
       }
@@ -1520,8 +1521,7 @@ async function pollESPN(silent = true) {
     applied++;
   }
 
-  // Update timestamps on existing results from ESPN game.date (always authoritative)
-  // Then save so corrected ts values persist to JSONBin
+  // Update timestamps on existing results
   let tsUpdated = 0;
   for (const game of allEvents) {
     if (!game.date || !game.status?.type?.completed) continue;
@@ -1530,7 +1530,7 @@ async function pollESPN(silent = true) {
     const nameA = espnName(comps[0].team?.displayName || comps[0].team?.shortDisplayName);
     const nameB = espnName(comps[1].team?.displayName || comps[1].team?.shortDisplayName);
     if (!nameA || !nameB) continue;
-    const mi = getMS().findIndex(m =>
+    const mi = fullMS.findIndex(m =>
       (m.tA === nameA && m.tB === nameB) || (m.tA === nameB && m.tB === nameA)
     );
     if (mi >= 0 && R[mi]) {
@@ -2466,6 +2466,8 @@ const CONFIRMED = {
   53:{winner:'TENNESSEE', loser:'IOWA ST',   earned:19,   ts:new Date('2026-03-28T02:10:00Z').getTime()},
   54:{winner:'IOWA',      loser:'NEBRASKA',  earned:14,   ts:new Date('2026-03-26T23:30:00Z').getTime()},
   55:{winner:'ILLINOIS',  loser:'HOUSTON',   earned:21,   ts:new Date('2026-03-27T02:05:00Z').getTime()},
+  // E8
+  57:{winner:'ARIZONA',   loser:'PURDUE',    earned:26,   ts:new Date('2026-03-29T00:59:00Z').getTime()},
 };
 Object.entries(CONFIRMED).forEach(([i,rv]) => { R[parseInt(i)] = rv; });
 
