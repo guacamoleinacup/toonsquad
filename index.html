@@ -1336,21 +1336,28 @@ function showModal(pid){
     ${(()=>{
       // Count knockouts by opponent owner
       const kills = {};
+      let selfKills = 0;
       Object.values(R).forEach(r => {
-        if(owner(r.winner)===pid && owner(r.loser)!==pid) {
+        if(owner(r.winner)===pid) {
           const opp = owner(r.loser);
-          kills[opp] = (kills[opp]||0) + 1;
+          if(opp===pid) selfKills++;
+          else kills[opp] = (kills[opp]||0) + 1;
         }
       });
       const entries = Object.entries(kills).sort((a,b)=>b[1]-a[1]);
-      if(!entries.length) return '<div style="background:var(--bg3);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--muted)">💀 No knockouts yet</div>';
+      if(!entries.length && !selfKills) return '<div style="background:var(--bg3);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--muted)">No knockouts yet</div>';
       return `<div style="background:var(--bg3);border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-        <span style="font-size:11px;color:var(--muted);margin-right:4px">💀</span>
+        <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-right:6px">Knockouts</span>
         ${entries.map(([p,n])=>`<span style="display:inline-flex;align-items:center;gap:5px;background:var(--bg4);border-radius:20px;padding:3px 10px">
           <span style="width:8px;height:8px;border-radius:50%;background:${COLORS[p]||'#888'};display:inline-block;flex-shrink:0"></span>
           <span style="font-size:12px;font-weight:700;color:${COLORS[p]||'#888'}">${p}</span>
           <span style="font-size:12px;color:var(--muted)">×${n}</span>
         </span>`).join('')}
+        ${selfKills?`<span style="display:inline-flex;align-items:center;gap:5px;background:var(--bg4);border-radius:20px;padding:3px 10px">
+          <span style="font-size:12px">🤝</span>
+          <span style="font-size:12px;font-weight:700;color:var(--muted)">self</span>
+          <span style="font-size:12px;color:var(--muted)">×${selfKills}</span>
+        </span>`:''}
       </div>`;
     })()}
     <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;margin-bottom:4px">
