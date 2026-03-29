@@ -699,7 +699,7 @@ async function syncPull() {
       Object.values(R).forEach(r => { if(r.earned===undefined) r.earned=bid(r.loser)||0; });
       // Apply confirmed results to fix any gaps/errors in JSONBin data
       let patched = false;
-      Object.entries(CONFIRMED).forEach(([i,rv]) => { if(!R[parseInt(i)]){ R[parseInt(i)]=rv; patched=true; } });
+      Object.entries(CONFIRMED).forEach(([i,rv]) => { R[parseInt(i)]=rv; patched=true; });
       rebuildP(); saveLocal();
       if(patched) syncPush();
       renderAll(); setSyncStatus('live','Live — synced'); }
@@ -2462,7 +2462,7 @@ const CONFIRMED = {
   54:{winner:'IOWA',      loser:'NEBRASKA',  earned:14,   ts:new Date('2026-03-26T23:30:00Z').getTime()},
   55:{winner:'ILLINOIS',  loser:'HOUSTON',   earned:21,   ts:new Date('2026-03-27T02:05:00Z').getTime()},
 };
-Object.entries(CONFIRMED).forEach(([i,rv]) => { if(!R[parseInt(i)]) R[parseInt(i)] = rv; });
+Object.entries(CONFIRMED).forEach(([i,rv]) => { R[parseInt(i)] = rv; });
 
 renderAll();
 renderHistory();
