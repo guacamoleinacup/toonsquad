@@ -1235,9 +1235,9 @@ function renderBracket(){
     const roundDone = roundMS.filter(m=>R[m.i]).length;
     // R64 is complete if any R32 results exist (ESPN is source of truth)
     const allComplete = round==='R64' ? hasR32 : (roundDone === roundMS.length && roundMS.length > 0);
-    // Open whichever round is currently in progress; preserve user toggle for others
+    // In-progress rounds always open; completed/upcoming respect saved state or default closed
     const inProgress = roundDone > 0 && !allComplete;
-    const isOpen = round in openState ? openState[round] : inProgress;
+    const isOpen = inProgress ? true : (round in openState ? openState[round] : false);
 
     const statusBadge = allComplete
       ? '<span style="font-size:11px;background:rgba(61,214,140,.15);color:var(--green);padding:2px 8px;border-radius:20px;font-weight:600">Complete</span>'
