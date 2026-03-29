@@ -699,7 +699,10 @@ async function syncPull() {
       Object.values(R).forEach(r => { if(r.earned===undefined) r.earned=bid(r.loser)||0; });
       // Apply confirmed results to fix any gaps/errors in JSONBin data
       let patched = false;
-      Object.entries(CONFIRMED).forEach(([i,rv]) => { R[parseInt(i)]=rv; patched=true; });
+      Object.entries(CONFIRMED).forEach(([i,rv]) => {
+        const idx = parseInt(i);
+        if(JSON.stringify(R[idx]) !== JSON.stringify(rv)) { R[idx]=rv; patched=true; }
+      });
       rebuildP(); saveLocal();
       if(patched) syncPush();
       renderAll(); setSyncStatus('live','Live — synced'); }
@@ -1482,6 +1485,8 @@ async function pollESPN(silent = true) {
 
   // Update live scores on bracket cards for ALL games (in-progress + completed)
   processESPNEvents(allEvents);
+  // Ensure confirmed results are always in R before rendering
+  Object.entries(CONFIRMED).forEach(([i,rv]) => { if(JSON.stringify(R[parseInt(i)])!==JSON.stringify(rv)){R[parseInt(i)]=rv;} });
   renderBracket();
 
   for (const game of completed) {
