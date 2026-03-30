@@ -566,8 +566,8 @@ function buildDynamicMS() {
     full.push({r: regionsE8[i], round:'E8', tA, tB, sA:seed(tA), sB:seed(tB), dynamic:true});
   });
 
-  full.push({r:'Final Four', round:'F4', tA: winnerOf(56)||`W56`, tB: winnerOf(57)||`W57`, sA:seed(winnerOf(56)||''), sB:seed(winnerOf(57)||''), dynamic:true});
-  full.push({r:'Final Four', round:'F4', tA: winnerOf(58)||`W58`, tB: winnerOf(59)||`W59`, sA:seed(winnerOf(58)||''), sB:seed(winnerOf(59)||''), dynamic:true});
+  full.push({r:'Final Four', round:'F4', tA: winnerOf(56)||`W56`, tB: winnerOf(59)||`W59`, sA:seed(winnerOf(56)||''), sB:seed(winnerOf(59)||''), dynamic:true});
+  full.push({r:'Final Four', round:'F4', tA: winnerOf(57)||`W57`, tB: winnerOf(58)||`W58`, sA:seed(winnerOf(57)||''), sB:seed(winnerOf(58)||''), dynamic:true});
 
   full.push({r:'Championship', round:'Champ', tA: winnerOf(60)||`W60`, tB: winnerOf(61)||`W61`, sA:seed(winnerOf(60)||''), sB:seed(winnerOf(61)||''), dynamic:true});
 
@@ -2508,7 +2508,10 @@ const CONFIRMED = {
   54:{winner:'IOWA',      loser:'NEBRASKA',  earned:14,   ts:new Date('2026-03-26T23:30:00Z').getTime()},
   55:{winner:'ILLINOIS',  loser:'HOUSTON',   earned:21,   ts:new Date('2026-03-27T02:05:00Z').getTime()},
   // E8
-  57:{winner:'ARIZONA',   loser:'PURDUE',    earned:26,   ts:new Date('2026-03-29T00:59:00Z').getTime()},
+  56:{winner:'UCONN',    loser:'DUKE',      earned:35.5, ts:new Date('2026-03-29T21:05:00Z').getTime()},
+  57:{winner:'ARIZONA',  loser:'PURDUE',    earned:26,   ts:new Date('2026-03-29T00:59:00Z').getTime()},
+  58:{winner:'MICHIGAN', loser:'TENNESSEE', earned:3.5,  ts:new Date('2026-03-29T18:15:00Z').getTime()},
+  59:{winner:'ILLINOIS', loser:'IOWA',      earned:1.5,  ts:new Date('2026-03-29T00:59:00Z').getTime()},
 };
 Object.entries(CONFIRMED).forEach(([i,rv]) => { R[parseInt(i)] = rv; });
 
