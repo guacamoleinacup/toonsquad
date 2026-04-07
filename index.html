@@ -657,6 +657,7 @@ function togglePaid(p) {
 function isOut(n) { return Object.values(R).some(r=>r.loser===n); }
 function aliveCount(p) { return TEAMS.filter(t=>t.o===p&&!isOut(t.n)).length; }
 function potential(p) {
+  if(Object.keys(R).length >= 63) return 0;
   let tot=0;
   TEAMS.filter(t=>t.o===p&&!isOut(t.n)).forEach(t=>{
     getMS().forEach((m,i)=>{
