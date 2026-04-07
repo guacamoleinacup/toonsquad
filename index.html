@@ -2532,12 +2532,10 @@ if(A.phase==='setup'){
   document.getElementById('auction-live').style.display='block';
   renderAuctionLive();
 }
-if(syncCfg) startSync();
-startESPNPoll();
-// Fire ESPN immediately — renderBracket is called inside pollESPN once schedule data arrives
+// Tournament complete — do one-time pull only, no continuous polling
+if(syncCfg) syncPull();
 pollESPN(false);
-fetchBracketSchedule();
-setInterval(fetchBracketSchedule, 120000);
+fetchBracketSchedule(); // one-time on load for schedule display
 </script>
 </body>
 </html>
