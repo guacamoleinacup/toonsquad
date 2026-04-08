@@ -2263,15 +2263,21 @@ const HIST_TEAMS = [
 ];
 
 function get2026AnalyticsTeams() {
+  const champBonus = Object.keys(R).length >= 63 ? (() => {
+    const allLosers = new Set(Object.values(R).map(r=>r.loser));
+    return [...TEAMS.map(t=>t.n)].find(n=>!allLosers.has(n) && Object.values(R).some(r=>r.winner===n||r.loser===n));
+  })() : null;
+
   return TEAMS.map(t => {
-    // Sum earnings from all wins by this team
     let teamEarned = 0;
     getMS().forEach((m, i) => {
       const rv = R[i];
       if (rv && rv.winner === t.n && owner(t.n) === t.o) {
-        teamEarned += bid(rv.loser);
+        teamEarned += rv.earned !== undefined ? rv.earned : bid(rv.loser);
       }
     });
+    // Add champ bonus+bid-back for the champion
+    if (champBonus === t.n) teamEarned += t.b + 32;
     return {year:2026, team:t.n, seed:t.s, region: getMS().find(m=>m.tA===t.n||m.tB===t.n)?.r||'', owner:t.o, bid:t.b, earned:teamEarned};
   });
 }
@@ -2337,10 +2343,10 @@ function renderAnalytics() {
         });
       }
     } else {
-      teams.forEach(t=>{
-        if(!playerTotals[t.owner]) playerTotals[t.owner]={spent:0,earned:0};
-        playerTotals[t.owner].spent += t.bid;
-        playerTotals[t.owner].earned += t.earned;
+      // Use earned() directly which includes champ bonus
+      PLAYERS.forEach(p => {
+        const spent = teams.filter(t=>t.owner===p.id).reduce((s,t)=>s+t.bid,0);
+        playerTotals[p.id] = {spent, earned: earned(p.id)};
       });
     }
     const roiRows = Object.entries(playerTotals).map(([p,d])=>({player:p,...d,roi:+(d.earned/d.spent).toFixed(2)})).sort((a,b)=>b.roi-a.roi);
