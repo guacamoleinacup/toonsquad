@@ -2090,7 +2090,7 @@ function get2026Results() {
 function renderHistory() {
   const allYears = [
     ...HISTORY,
-    {year:2026, results:get2026Results(), live:true}
+    {year:2026, results:get2026Results(), live:Object.keys(R).length < 63}
   ];
 
   // Build all-time per player
@@ -2299,7 +2299,7 @@ function renderAnalytics() {
   // Build year datasets
   const years = [
     {year:2025, live:false, teams: HIST_TEAMS.filter(t=>t.year===2025)},
-    {year:2026, live:true,  teams: get2026AnalyticsTeams()},
+    {year:2026, live:Object.keys(R).length < 63, teams: get2026AnalyticsTeams()},
   ];
 
   function renderYear(yr) {
