@@ -579,7 +579,10 @@ function getMS() { return buildDynamicMS(); }
 
 // ===== STATE =====
 let R = {}, P = {}, PAID = {}; // R = results {idx:{winner,loser}}, P = payouts {player:$}, PAID = overrides
-let syncCfg = JSON.parse(localStorage.getItem('ts26sync')||'null') || {id:'69bb1c39c3097a1dd539a41a',key:'$2a$10$bi8u/5Db8qyxEsv/QYyvuu03trS2sjASrsf0TXa.m3CIfARihdZdS'};
+const SUPABASE_URL = 'https://kqzbdzmzuyibphefbnrn.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxemJkem16dXlpYnBoZWZibnJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5Njk0NjMsImV4cCI6MjA5NTU0NTQ2M30.En_fofTXv9mSRblfstfmq-ShwOzhM7E2oALlvOSXJrA';
+const SUPABASE_TABLE = 'toonsquadmm';
+let syncCfg = true; // always connected
 let syncIv = null, lastHash = '';
 
 // ===== ADMIN AUTH =====
@@ -676,30 +679,36 @@ function potential(p) {
 
 // ===== SYNC =====
 async function syncPush() {
-  if(!syncCfg) return;
   try {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${syncCfg.id}`,{
-      method:'PUT', headers:{'Content-Type':'application/json','X-Master-Key':syncCfg.key},
-      body:JSON.stringify({R,PAID})
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({id: 'state', data: {R, PAID}, updated_at: new Date().toISOString()})
     });
-    setSyncStatus(res.ok?'live':'error', res.ok?'Synced':'Push failed');
+    setSyncStatus(res.ok ? 'live' : 'error', res.ok ? 'Synced' : 'Push failed');
     if(res.ok) saveLocal();
-  } catch(e) { setSyncStatus('error','Offline'); }
+  } catch(e) { setSyncStatus('error', 'Offline'); }
 }
 async function syncPull() {
-  if(!syncCfg) return;
   try {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${syncCfg.id}/latest`,{
-      headers:{'X-Master-Key':syncCfg.key}
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?id=eq.state&select=data`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
     });
     if(!res.ok){ setSyncStatus('error','Pull failed'); return; }
-    const data = await res.json();
-    const remote = data.record||{};
+    const rows = await res.json();
+    if(!rows.length){ setSyncStatus('error','No data'); return; }
+    const remote = rows[0].data || {};
     const h = JSON.stringify(remote);
     if(h!==lastHash){ lastHash=h; R=remote.R||{}; PAID=remote.PAID||{};
-      // Migrate old entries missing earned
       Object.values(R).forEach(r => { if(r.earned===undefined) r.earned=bid(r.loser)||0; });
-      // Apply confirmed results to fix any gaps/errors in JSONBin data
       let patched = false;
       Object.entries(CONFIRMED).forEach(([i,rv]) => {
         const idx = parseInt(i);
@@ -718,7 +727,6 @@ function setSyncStatus(s,msg){
   if(lbl) lbl.textContent=msg;
 }
 function startSync(){
-  if(!syncCfg) return;
   setSyncStatus('','Connecting...');
   syncPull();
   if(syncIv) clearInterval(syncIv);
@@ -2539,7 +2547,7 @@ if(A.phase==='setup'){
   renderAuctionLive();
 }
 // Tournament complete — do one-time pull only, no continuous polling
-if(syncCfg) syncPull();
+syncPull();
 pollESPN(false);
 fetchBracketSchedule(); // one-time on load for schedule display
 </script>
